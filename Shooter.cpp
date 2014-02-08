@@ -10,15 +10,18 @@ class Shooter : public Spyder::Subsystem
 private:
 	Spyder::ConfigVar<UINT32> motorShoot1;
 	Spyder::ConfigVar<UINT32> motorShoot2;
-	Spyder::ConfigVar<UINT32> shooterRamp;
 	Spyder::ConfigVar<UINT32> pistonSolenoidExt;
 	Spyder::ConfigVar<UINT32> pistonSolenoidRet;
 	Spyder::ConfigVar<double> firePhase1Time;
 	Spyder::ConfigVar<double> firePhase2Time;
 	Spyder::ConfigVar<double> firePhase3Time;
+	Spyder::ConfigVar<double> firePreset1;
+	Spyder::ConfigVar<double> firePreset2;
+	Spyder::ConfigVar<double> firePreset3;
 	
-	Spyder::TwoIntConfig fireButton;
-	Spyder::TwoIntConfig shooterJoystick;
+	Spyder::TwoIntConfig fireButton1;
+	Spyder::TwoIntConfig fireButton2;
+	Spyder::TwoIntConfig fireButton3;
 	
 	bool isPistonOut;
 	float speed;
@@ -28,10 +31,13 @@ private:
 	
 public:
 	Shooter() : Spyder::Subsystem("Shooter"), motorShoot1("firstShooterMotor",4), //Get correct numbers
-			motorShoot2("secondShooterMotor", 3), shooterJoystick("adjustShooterHeight", 3, 1),
-			pistonSolenoidExt("shooter_pistonSolenoidExt", 1), pistonSolenoidRet("shooter_pistonSolenoidRet", 2),
-			fireButton("bind_shooterFire", 3, 2), isPistonOut(false), speed(0.f), lastShooterChange(0.0), 
-			shooterRamp("Motor ramp is set", 0.66)
+			motorShoot2("secondShooterMotor", 3), pistonSolenoidExt("shooter_pistonSolenoidExt", 1), 
+			pistonSolenoidRet("shooter_pistonSolenoidRet", 2), firePhase1Time ("shooter_firetime1", 1),
+			firePhase2Time("shooter_firetime2", 1), firePhase3Time ("shooter_firetime3", 1), 
+			firePreset1("winch_preset1", 1),firePreset2("winch_preset2", 0.75),
+			firePreset3("winch_preset3", 0.5), fireButton1("bind_shooterFire1", 3, 2),
+			fireButton2("bind_shooterFire2", 4, 2), fireButton3("bind_shooterFire3", 5, 2),
+			isPistonOut(false), speed(0.f), lastShooterChange(0.0), firePhase(0), fireStart(0)
 	{
 	}
 	virtual ~Shooter()
@@ -94,7 +100,6 @@ public:
 				if(Spyder::GetJoystick(fireButton.GetVar(1))->GetRawButton(fireButton.GetVar(2))
 						&& !firePhase)
 				{
-					
 					firePhase = 1;
 				}
 					
