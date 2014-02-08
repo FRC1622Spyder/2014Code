@@ -13,6 +13,9 @@ private:
 	Spyder::ConfigVar<UINT32> shooterRamp;
 	Spyder::ConfigVar<UINT32> pistonSolenoidExt;
 	Spyder::ConfigVar<UINT32> pistonSolenoidRet;
+	Spyder::ConfigVar<double> firePhase1Time;
+	Spyder::ConfigVar<double> firePhase2Time;
+	Spyder::ConfigVar<double> firePhase3Time;
 	
 	Spyder::TwoIntConfig fireButton;
 	Spyder::TwoIntConfig shooterJoystick;
@@ -87,45 +90,50 @@ public:
 				double curTime = (double)tp.tv_sec + double(double(tp.tv_nsec)*1e-9);
 				double teleopRunTime = curTime - fireStart;
 				
-				//when Kyle presses button, winch down fully
-				if(Spyder::GetJoystick(fireButton.GetVar(1))->GetRawButton(fireButton.GetVar(2)))
+				//when Kyle presses button, firephase = 0
+				if(Spyder::GetJoystick(fireButton.GetVar(1))->GetRawButton(fireButton.GetVar(2))
+						&& !firePhase)
 				{
-					Spyder::GetSolenoid(pistonSolenoidExt.GetVal())->Set(true);
-					Spyder::GetSolenoid(pistonSolenoidRet.GetVal())->Set(false);
-					switch(firePhase)//meant to fire then reset
-					{
-						case 0://initialize
-							if (teleopRunTime >= 1)
-							{
-								++firePhase;
-								fireStart = curTime;
-							}
-							break;
-						case 1://Re-engage the arm!
-							Spyder::GetSolenoid(pistonSolenoidExt.GetVal())->Set(false);
-							Spyder::GetSolenoid(pistonSolenoidRet.GetVal())->Set(true);
-							if(teleopRunTime >=0.7)
-							{
-								++firePhase;
-							}
-							break;
-						case 2://Winch it back down !
-							Spyder::GetVictor(motorShoot1.GetVal())->Set(1);
-							Spyder::GetVictor(motorShoot2.GetVal())->Set(1);
-							if(teleopRunTime >1.4)//Get actual time
-							{
-								++firePhase;
-							}
-							break;
-						case 3://Stop motors after winching
-							Spyder::GetVictor(motorShoot1.GetVal())->Set(0);
-							Spyder::GetVictor(motorShoot2.GetVal())->Set(0);
-							break;
-					}
+					
+					firePhase = 1;
+				}
+					
+				switch(firePhase)//meant to fire then reset
+				{
+					case 1://initialize
+						Spyder::GetSolenoid(pistonSolenoidRet.GetVal())->Set(false);
+						Spyder::GetSolenoid(pistonSolenoidExt.GetVal())->Set(true);
+						if (teleopRunTime >= firePhase1Time.GetVal())
+						{
+							fireStart = curTime;
+							++firePhase;
+						}
+						break;
+					case 2://Re-engage the arm!
+						Spyder::GetSolenoid(pistonSolenoidExt.GetVal())->Set(false);
+						Spyder::GetSolenoid(pistonSolenoidRet.GetVal())->Set(true);
+						if(teleopRunTime >=firePhase2Time.GetVal())
+						{
+							++firePhase;
+						}
+						break;
+					case 3://Winch it back down !
+						Spyder::GetVictor(motorShoot1.GetVal())->Set(1);
+						Spyder::GetVictor(motorShoot2.GetVal())->Set(1);
+						if(teleopRunTime >firePhase3Time.GetVal())//Get actual time
+						{
+							firePhase = 0;
+						}
+						break;
+					case 0://Stop motors after winching
+						Spyder::GetVictor(motorShoot1.GetVal())->Set(0);
+						Spyder::GetVictor(motorShoot2.GetVal())->Set(0);
+						break;
+				}
 					
 					/*Spyder::GetVictor(motorShoot1.GetVal())->Set(speed);//find what speed it needs to be
 					Spyder::GetVictor(motorShoot2.GetVal())->Set(speed);*/
-				}
+				
 			}
 				break;
 		};
