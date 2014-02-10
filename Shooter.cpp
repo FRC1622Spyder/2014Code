@@ -81,13 +81,7 @@ public:
 				break;
 				
 			case Spyder::M_TELEOP://Tele-operation code here
-			{
-				Joystick *joystick = Spyder::GetJoystick(shooterJoystick.GetVar(1));//get correct joystick number from mechanical
-				float val = joystick->GetRawAxis(shooterJoystick.GetVar(2));
-				val = std::fabs(val) > Spyder::GetDeadzone() ? val : 0;
-				if(val < 0)
-					val=0;
-				
+			{	
 				struct timespec tp;
 				timespec theTimespec;
 				clock_gettime(CLOCK_REALTIME, &theTimespec);
@@ -135,9 +129,6 @@ public:
 						Spyder::GetVictor(motorShoot2.GetVal())->Set(0);
 						break;
 				}
-					
-					/*Spyder::GetVictor(motorShoot1.GetVal())->Set(speed);//find what speed it needs to be
-					Spyder::GetVictor(motorShoot2.GetVal())->Set(speed);*/
 				
 			}
 				break;
