@@ -19,9 +19,10 @@ private:
 	Spyder::ConfigVar<double> firePreset2;
 	Spyder::ConfigVar<double> firePreset3;
 	
-	Spyder::TwoIntConfig fireButton1;
-	Spyder::TwoIntConfig fireButton2;
-	Spyder::TwoIntConfig fireButton3;
+	Spyder::TwoIntConfig fireButton;
+	Spyder::TwoIntConfig fireWinch1;//winch preset location1
+	Spyder::TwoIntConfig fireWinch2;
+	Spyder::TwoIntConfig fireWinch3;
 	
 	bool isPistonOut;
 	float speed;
@@ -35,8 +36,8 @@ public:
 			pistonSolenoidRet("shooter_pistonSolenoidRet", 2), firePhase1Time ("shooter_firetime1", 1),
 			firePhase2Time("shooter_firetime2", 1), firePhase3Time ("shooter_firetime3", 1), 
 			firePreset1("winch_preset1", 1),firePreset2("winch_preset2", 0.75),
-			firePreset3("winch_preset3", 0.5), fireButton1("bind_shooterFire1", 3, 2),
-			fireButton2("bind_shooterFire2", 4, 2), fireButton3("bind_shooterFire3", 5, 2),
+			firePreset3("winch_preset3", 0.5), fireButton("bind_shooterFire1", 3, 2),
+			fireWinch1("winch_pos1", 4, 2), fireWinch2("winch_pos2", 5, 2), fireWinch3("winch_pos3", 6, 2),
 			isPistonOut(false), speed(0.f), lastShooterChange(0.0), firePhase(0), fireStart(0)
 	{
 	}
@@ -113,23 +114,35 @@ public:
 						Spyder::GetSolenoid(pistonSolenoidRet.GetVal())->Set(true);
 						if(teleopRunTime >=firePhase2Time.GetVal())
 						{
-							++firePhase;
+							firePhase = 0;
 						}
 						break;
-					case 3://Winch it back down !
+					/*case 3://Winch it back down !
 						Spyder::GetVictor(motorShoot1.GetVal())->Set(1);
 						Spyder::GetVictor(motorShoot2.GetVal())->Set(1);
 						if(teleopRunTime >firePhase3Time.GetVal())//Get actual time
 						{
 							firePhase = 0;
 						}
-						break;
+						break;*/
 					case 0://Stop motors after winching
 						Spyder::GetVictor(motorShoot1.GetVal())->Set(0);
 						Spyder::GetVictor(motorShoot2.GetVal())->Set(0);
 						break;
 				}
 				
+				if(Spyder::GetJoystick(fireWinch1.GetVar(1))->GetRawButton(fireWinch1.GetVar(2)))
+					{
+					//insert PID stuff for winch position 1
+					}
+				if(Spyder::GetJoystick(fireWinch2.GetVar(1))->GetRawButton(fireWinch2.GetVar(2)))
+					{
+					//insert PID stuff for winch position 2
+					}
+				if(Spyder::GetJoystick(fireWinch3.GetVar(1))->GetRawButton(fireWinch3.GetVar(2)))
+					{
+					//insert PID stuff for winch position 3
+					}
 			}
 				break;
 		};
