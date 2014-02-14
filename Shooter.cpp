@@ -14,7 +14,7 @@ private:
 	Spyder::ConfigVar<UINT32> pistonSolenoidRet;
 	Spyder::ConfigVar<double> firePhase1Time;
 	Spyder::ConfigVar<double> firePhase2Time;
-	Spyder::ConfigVar<double> firePhase3Time;
+	//Spyder::ConfigVar<double> firePhase3Time;
 	Spyder::ConfigVar<double> firePreset1;
 	Spyder::ConfigVar<double> firePreset2;
 	Spyder::ConfigVar<double> firePreset3;
@@ -34,7 +34,7 @@ public:
 	Shooter() : Spyder::Subsystem("Shooter"), motorShoot1("firstShooterMotor",4), //Get correct numbers
 			motorShoot2("secondShooterMotor", 3), pistonSolenoidExt("shooter_pistonSolenoidExt", 1), 
 			pistonSolenoidRet("shooter_pistonSolenoidRet", 2), firePhase1Time ("shooter_firetime1", 1),
-			firePhase2Time("shooter_firetime2", 1), firePhase3Time ("shooter_firetime3", 1), 
+			firePhase2Time("shooter_firetime2", 1), /*firePhase3Time ("shooter_firetime3", 1),*/ 
 			firePreset1("winch_preset1", 1),firePreset2("winch_preset2", 0.75),
 			firePreset3("winch_preset3", 0.5), fireButton("bind_shooterFire1", 3, 2),
 			fireWinch1("winch_pos1", 4, 2), fireWinch2("winch_pos2", 5, 2), fireWinch3("winch_pos3", 6, 2),
