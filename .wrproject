@@ -234,6 +234,13 @@
     </attributes>
     <buildtargets>
         <buildtarget buildtool="Linker" name="2014Code" passed="false" targetname="2014Code">
+            <attributes>
+                <mapAttribute>
+                    <listAttribute key="BLD::Info|Libs|PPC603gnu">
+                        <stringAttribute value="$(WIND_BASE)/target/lib/WPILib.a"/>
+                    </listAttribute>
+                </mapAttribute>
+            </attributes>
             <contents>
                 <buildtargetreference name="/2014Code/2014Code_partialImage"/>
             </contents>
