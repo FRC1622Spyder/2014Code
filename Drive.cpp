@@ -22,7 +22,6 @@ class Drive : public Spyder::Subsystem
 		Spyder::TwoIntConfig reverseBtn;
 		Spyder::TwoIntConfig halfSpeed;
 		
-		Spyder::ConfigVar<double> ramp;
 		
 		Spyder::ConfigVar<float> curvature;
 	
@@ -33,7 +32,7 @@ class Drive : public Spyder::Subsystem
 				rightMotor("rightDriveMotor", 1), leftMotorInv("leftDriveInverted", true),
 				rightMotorInv("rightDriveInverted", false), reversed(false),
 				lastRevBtnVal(false), reverseBtn("bind_driveReverse", 2, 3),
-				halfSpeed("bind_halfSpeedDrive", 1, 1), ramp("drive_ramp", 0.666), curvature("drive_curvature",0.3f)
+				halfSpeed("bind_halfSpeedDrive", 1, 1), curvature("drive_curvature",0.3f)
 		{
 		}
 		
