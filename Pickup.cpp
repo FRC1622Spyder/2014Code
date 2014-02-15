@@ -17,7 +17,7 @@ class Pickup : public Spyder::Subsystem
 		double counter;
 		int init;
 public:
-		Pickup() : Spyder::Subsystem("Pickup"), extendSol("pickup_open_sol", 5), releaseSol("pickup_release_sol", 6),
+		Pickup() : Spyder::Subsystem("Pickup"), extendSol("pickup_open_sol", 5), releaseSol("pickup_close_sol", 6),
 		eSol("bind_pickup_close", 3, 6), rSol("bind_pickup_open", 3, 7), 
 		arm("pickup_arm_mot", 12), stick("bind_pickup_arm_axis", 3, 2), 
 		rampPickup("pickup_ramp", 0.666), counter(0.), init(0)
@@ -64,12 +64,12 @@ public:
 						Spyder::GetSolenoid(releaseSol.GetVal())->Set(true);
 					}
 			
-					
+					break;
 				default:
 					Spyder::GetSolenoid(extendSol.GetVal())->Set(false);
 					Spyder::GetSolenoid(releaseSol.GetVal())->Set(true);
 					Spyder::GetVictor(arm.GetVal())->Set(0.0f);
-						break;
+					break;
 				}
 		}
 		virtual void RobotInit()
