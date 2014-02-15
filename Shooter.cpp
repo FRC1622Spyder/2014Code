@@ -85,7 +85,7 @@ public:
 				Spyder::GetVictor(motorShoot2.GetVal())->Set(0);
 			}
 				break;
-				
+			case Spyder::M_TEST:
 			case Spyder::M_TELEOP://Tele-operation code here
 			{	
 				if(Spyder::GetJoystick(fireWinch1.GetVar(1))->GetRawButton(fireWinch1.GetVar(2)))
