@@ -18,8 +18,8 @@ class Pickup : public Spyder::Subsystem
 
 public:
 		Pickup() : Spyder::Subsystem("Pickup"), extendSol("pickup_open_sol", 5), releaseSol("pickup_close_sol", 6),
-		eSol("bind_pickup_close", 3, 6), rSol("bind_pickup_open", 3, 7), 
-		arm("pickup_arm_mot", 12), pickButton_in("bind_intake_button", 3, 2), pickButton_out("bind_outake_button",4,3)
+		eSol("bind_pickup_close", 3, 5), rSol("bind_pickup_open", 3, 6), 
+		arm("pickup_arm_mot", 12), pickButton_in("bind_intake_button", 3, 8), pickButton_out("bind_outake_button",3,7)
 		{	
 		}	 
 		virtual ~Pickup() 
