@@ -47,9 +47,17 @@ public:
 					{
 						Spyder::GetVictor(arm.GetVal())->Set(1);
 					}
+					else
+					{
+						Spyder::GetVictor(arm.GetVal())->Set(0);
+					}
 					if(Spyder::GetJoystick(pickButton_out.GetVar(1))->GetRawButton(pickButton_out.GetVar(2)))
 					{
 						Spyder::GetVictor(arm.GetVal())->Set(-1);
+					}
+					else
+					{
+						Spyder::GetVictor(arm.GetVal())->Set(0);
 					}
 					
 					if(Spyder::GetJoystick(eSol.GetVar(1))->GetRawButton(eSol.GetVar(2))==true) {
