@@ -121,13 +121,22 @@ public:
 			case Spyder::M_TELEOP://Tele-operation code here
 			{	
 				if(Spyder::GetJoystick(fireWinch1.GetVar(1))->GetRawButton(fireWinch1.GetVar(2)))
+				{
 					winchTime = firePreset1.GetVal();//Trial + Error the shit out of this
+					firePhase = 3;//Goes directly to winchdown in firephase
+				}
 				
 				if(Spyder::GetJoystick(fireWinch1.GetVar(1))->GetRawButton(fireWinch1.GetVar(2)))
+				{
 					winchTime = firePreset2.GetVal();//Ditto
+					firePhase = 3;//Goes directly to winchdown in firephase
+				}
 				
 				if(Spyder::GetJoystick(fireWinch1.GetVar(1))->GetRawButton(fireWinch1.GetVar(2)))
+				{
 					winchTime = firePreset3.GetVal();//Ditto
+					firePhase = 3;//Goes directly to winchdown in firephase
+				}
 				
 				struct timespec tp;
 				timespec theTimespec;
