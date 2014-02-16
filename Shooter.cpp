@@ -17,10 +17,7 @@ private:
 	Spyder::ConfigVar<double> firePreset1;
 	Spyder::ConfigVar<double> firePreset2;
 	Spyder::ConfigVar<double> firePreset3;
-	Spyder::ConfigVar<double> proportion;
-	Spyder::ConfigVar<double> integral;
-	Spyder::ConfigVar<double> differential;
-	
+
 	Spyder::TwoIntConfig fireButton;
 	Spyder::TwoIntConfig fireWinch1;//winch preset location1
 	Spyder::TwoIntConfig fireWinch2;
@@ -37,12 +34,10 @@ public:
 	Shooter() : Spyder::Subsystem("Shooter"), motorShoot1("firstShooterMotor",4), //Get correct numbers
 			motorShoot2("secondShooterMotor", 3), pistonSolenoidExt("shooter_pistonSolenoidExt", 1), 
 			pistonSolenoidRet("shooter_pistonSolenoidRet", 2), firePhase1Time ("shooter_firetime1", 1),
-			firePhase2Time("shooter_firetime2", 1), 
-			firePreset1("winch_preset1", 1),firePreset2("winch_preset2", 0.75),
-			firePreset3("winch_preset3", 0.5), proportion("proportion_val", 1),
-			integral("integral_val", 1), differential("differential_val", 1), 
-			fireButton("bind_shooterFire1", 3, 2), fireWinch1("winch_pos1", 4, 2), 
-			fireWinch2("winch_pos2", 5, 2), fireWinch3("winch_pos3", 6, 2), isPistonOut(false), 
+			firePhase2Time("shooter_firetime2", 1), firePreset1("winch_preset1", 1),
+			firePreset2("winch_preset2", 0.75),firePreset3("winch_preset3", 0.5),
+			fireButton("bind_shooterFire1", 3, 2), fireWinch1("winch_pos1", 3, 1), 
+			fireWinch2("winch_pos2", 3, 3), fireWinch3("winch_pos3", 3, 4), isPistonOut(false), 
 			speed(0.f), lastShooterChange(0.0), firePhase(0), fireStart(0), winchTime(0)
 	{
 	}
@@ -90,8 +85,10 @@ public:
 			{	
 				if(Spyder::GetJoystick(fireWinch1.GetVar(1))->GetRawButton(fireWinch1.GetVar(2)))
 					winchTime = 1;//Trial + Error the shit out of this
+				
 				if(Spyder::GetJoystick(fireWinch1.GetVar(1))->GetRawButton(fireWinch1.GetVar(2)))
 					winchTime = 2;//Ditto
+				
 				if(Spyder::GetJoystick(fireWinch1.GetVar(1))->GetRawButton(fireWinch1.GetVar(2)))
 					winchTime = 3;//Ditto
 				
@@ -141,20 +138,6 @@ public:
 						Spyder::GetVictor(motorShoot1.GetVal())->Set(0);
 						Spyder::GetVictor(motorShoot2.GetVal())->Set(0);
 						break;
-				}
-				
-				
-				if(Spyder::GetJoystick(fireWinch1.GetVar(1))->GetRawButton(fireWinch1.GetVar(2)))
-				{
-					//insert PID stuff for winch position 1
-				}
-				if(Spyder::GetJoystick(fireWinch2.GetVar(1))->GetRawButton(fireWinch2.GetVar(2)))
-				{
-					//insert PID stuff for winch position 2
-				}
-				if(Spyder::GetJoystick(fireWinch3.GetVar(1))->GetRawButton(fireWinch3.GetVar(2)))
-				{
-					//insert PID stuff for winch position 3
 				}
 			}
 				break;
