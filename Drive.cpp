@@ -25,9 +25,8 @@ class Drive : public Spyder::Subsystem
 		bool lastRevBtnVal;
 		Spyder::TwoIntConfig reverseBtn;
 		
-		float autospeed;
-		float invautospeed;
-		float autotime;
+		Spyder::ConfigVar<float> autospeed;
+		Spyder::ConfigVar<float> autotime;
 		double driveStart;
 	
 	public:
@@ -35,10 +34,10 @@ class Drive : public Spyder::Subsystem
 		Drive() : Spyder::Subsystem("Drive"), leftJoystick("bind_leftDrive", 1, 2),
 				rightJoystick("bind_rightDrive", 2, 2), leftMotor("leftDriveMotor", 2),
 				rightMotor("rightDriveMotor", 1), leftMotorInv("leftDriveInverted", true),
-				rightMotorInv("rightDriveInverted", false), reversed(false),
-				lastRevBtnVal(false), reverseBtn("bind_driveReverse", 2, 3),
-				halfSpeed("bind_halfSpeedDrive", 1, 1), ramp("drive_ramp", 0.666), autospeed(127.f),
-				invautospeed(-127.f), driveStart(0), autotime(10000.f)
+				rightMotorInv("rightDriveInverted", false), halfSpeed("bind_halfSpeedDrive", 1, 1),
+				ramp("drive_ramp", 0.666), reversed(false), lastRevBtnVal(false), 
+				reverseBtn("bind_driveReverse", 2, 3), autospeed("auto_run_speed",127.f),  
+				autotime("autonomous_run_time",10000.0f), driveStart(0)
 		{
 		}
 		
@@ -67,10 +66,10 @@ class Drive : public Spyder::Subsystem
 					double curTime = (double)tp.tv_sec + double(double(tp.tv_nsec)*1e-9);
 					double teleopRunTime = curTime - driveStart;
 					
-					if(teleopRunTime < autotime)
+					if(teleopRunTime < autotime.GetVal())
 					{
-						Spyder::GetVictor(leftMotor.GetVal())->Set(invautospeed);
-						Spyder::GetVictor(rightMotor.GetVal())->Set(autospeed);
+						Spyder::GetVictor(leftMotor.GetVal())->Set(-autospeed.GetVal());
+						Spyder::GetVictor(rightMotor.GetVal())->Set(autospeed.GetVal());
 					}
 					else
 					{
