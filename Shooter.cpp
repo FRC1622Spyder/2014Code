@@ -35,9 +35,9 @@ public:
 			pistonSolenoidRet("shooter_pistonSolenoidRet", 2), firePhase1Time ("shooter_firetime1", 1),
 			firePhase2Time("shooter_firetime2", 1), firePreset1("winch_time_preset1", 1),
 			firePreset2("winch_time_preset2", 0.75),firePreset3("winch_time_preset3", 0.5),
-			fireButton("bind_shooterFire1", 3, 2), fireWinch1("winch_pos1", 3, 1), 
-			fireWinch2("winch_pos2", 3, 3), fireWinch3("winch_pos3", 3, 4),
-			firePhase(0), fireStart(0), winchTime(0)
+			fireButton("bind_shooterFire1", 3, 2), fireWinch1("bind_winch_pos1", 3, 1), 
+			fireWinch2("bind_winch_pos2", 3, 3), fireWinch3("bind_winch_pos3", 3, 4),
+			firePhase(0), fireStart(0),autofireStart(0),autofirePhase(0), winchTime(0)
 	{
 	}
 	virtual ~Shooter()
