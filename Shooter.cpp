@@ -9,7 +9,6 @@ class Shooter : public Spyder::Subsystem
 {
 private:
 	Spyder::ConfigVar<UINT32> motorShoot1;
-	Spyder::ConfigVar<UINT32> motorShoot2;
 	Spyder::ConfigVar<UINT32> pistonSolenoidExt;
 	Spyder::ConfigVar<UINT32> pistonSolenoidRet;
 	Spyder::ConfigVar<double> firePhase1Time;
@@ -30,8 +29,8 @@ private:
 	double winchTime;
 	
 public:
-	Shooter() : Spyder::Subsystem("Shooter"), motorShoot1("firstShooterMotor",4), //Get correct numbers
-			motorShoot2("secondShooterMotor", 3), pistonSolenoidExt("shooter_pistonSolenoidExt", 1), 
+	Shooter() : Spyder::Subsystem("Shooter"), motorShoot1("ShooterMotor",4), //Get correct numbers
+			pistonSolenoidExt("shooter_pistonSolenoidExt", 1), 
 			pistonSolenoidRet("shooter_pistonSolenoidRet", 2), firePhase1Time ("shooter_firetime1", 1),
 			firePhase2Time("shooter_firetime2", 1), firePreset1("winch_time_preset1", 1),
 			firePreset2("winch_time_preset2", 0.75),firePreset3("winch_time_preset3", 0.5),
@@ -47,7 +46,6 @@ public:
 	virtual void Init(Spyder::RunModes runmode)
 	{
 		Spyder::GetVictor(motorShoot1.GetVal())->Set(0);
-		Spyder::GetVictor(motorShoot2.GetVal())->Set(0);
 		struct timespec tp;
 		switch(runmode)
 		{
@@ -73,7 +71,6 @@ public:
 		{
 			case Spyder::M_DISABLED://disabled code here
 			{	Spyder::GetVictor(motorShoot1.GetVal())->Set(0);
-				Spyder::GetVictor(motorShoot2.GetVal())->Set(0);
 				Spyder::GetSolenoid(pistonSolenoidExt.GetVal())->Set(false);
 				Spyder::GetSolenoid(pistonSolenoidRet.GetVal())->Set(true);
 			}
@@ -105,11 +102,9 @@ public:
 					break;
 				case 0:
 					Spyder::GetVictor(motorShoot1.GetVal())->Set(1);
-					Spyder::GetVictor(motorShoot2.GetVal())->Set(1);
 					if(autoRunTime > winchTime)
 					{
 						Spyder::GetVictor(motorShoot1.GetVal())->Set(0);
-						Spyder::GetVictor(motorShoot2.GetVal())->Set(0);
 						autofireStart = curTime;
 						autofirePhase++;
 					}
@@ -169,20 +164,21 @@ public:
 						Spyder::GetSolenoid(pistonSolenoidRet.GetVal())->Set(true);
 						if(teleopRunTime >=firePhase2Time.GetVal())
 						{
+							fireStart = curTime;
 							firePhase = 0;
 						}
 						break;
 					case 3://Winch it back down !
 						Spyder::GetVictor(motorShoot1.GetVal())->Set(1);
-						Spyder::GetVictor(motorShoot2.GetVal())->Set(1);
 						if(teleopRunTime >winchTime)//Get actual time
 						{
+							fireStart = curTime;
 							firePhase = 0;
 						}
 						break;
 					case 0://Stop motors after winching
 						Spyder::GetVictor(motorShoot1.GetVal())->Set(0);
-						Spyder::GetVictor(motorShoot2.GetVal())->Set(0);
+						fireStart = curTime;
 						break;
 				}
 			}
