@@ -13,7 +13,7 @@ private:
 	Spyder::ConfigVar<UINT32> pistonSolenoidRet;
 	Spyder::ConfigVar<double> firePhase1Time;
 	Spyder::ConfigVar<double> firePhase2Time;
-	Spyder::ConfigVar<float> firePreset1;//winch fire time preset 1
+	Spyder::ConfigVar<float> firePreset1;//winch distance preset 1
 	Spyder::ConfigVar<float> firePreset2;
 	Spyder::ConfigVar<float> firePreset3;
 
@@ -26,17 +26,17 @@ private:
 	double fireStart;
 	float autofireStart;
 	unsigned char autofirePhase;
-	double winchTime;
+	double winchDistance;//temp variable for storing fire presets
 	
 public:
 	Shooter() : Spyder::Subsystem("Shooter"), motorShoot1("ShooterMotor",4), //Get correct numbers
 			pistonSolenoidExt("shooter_pistonSolenoidExt", 1), 
 			pistonSolenoidRet("shooter_pistonSolenoidRet", 2), firePhase1Time ("shooter_firetime1", 1),
-			firePhase2Time("shooter_firetime2", 1), firePreset1("winch_time_preset1", 1),
-			firePreset2("winch_time_preset2", 0.75),firePreset3("winch_time_preset3", 0.5),
+			firePhase2Time("shooter_firetime2", 1), firePreset1("winch_distance_preset1", 20),
+			firePreset2("winch_distance_preset2", 15),firePreset3("winch_distance_preset3", 10),
 			fireButton("bind_shooterFire1", 3, 2), fireWinch1("bind_winch_pos1", 3, 1), 
 			fireWinch2("bind_winch_pos2", 3, 3), fireWinch3("bind_winch_pos3", 3, 4),
-			firePhase(0), fireStart(0),autofireStart(0),autofirePhase(0), winchTime(0)
+			firePhase(0), fireStart(0),autofireStart(0),autofirePhase(0), winchDistance(0)
 	{
 	}
 	virtual ~Shooter()
@@ -76,7 +76,7 @@ public:
 			}
 				break;
 			case Spyder::M_AUTO://autonomous code here
-			{
+			/*{
 				winchTime = firePreset3.GetVal();
 				struct timespec tp;
 				timespec theTimespec;
@@ -110,26 +110,29 @@ public:
 					}
 					break;
 				}
-			}
+			}*/
 				break;
 			case Spyder::M_TEST:
 			case Spyder::M_TELEOP://Tele-operation code here
 			{	
+				Encoder winchEncoder(14,13, true);//encoder constructor
+				winchEncoder.SetDistancePerPulse(3.14);
+				
 				if(Spyder::GetJoystick(fireWinch1.GetVar(1))->GetRawButton(fireWinch1.GetVar(2)))
 				{
-					winchTime = firePreset1.GetVal();//Trial + Error the shit out of this
+					winchDistance = firePreset1.GetVal();//Depends on how much motor spins
 					firePhase = 3;//Goes directly to winchdown in firephase
 				}
 				
 				if(Spyder::GetJoystick(fireWinch1.GetVar(1))->GetRawButton(fireWinch1.GetVar(2)))
 				{
-					winchTime = firePreset2.GetVal();//Ditto
+					winchDistance = firePreset2.GetVal();//Ditto
 					firePhase = 3;//Goes directly to winchdown in firephase
 				}
 				
 				if(Spyder::GetJoystick(fireWinch1.GetVar(1))->GetRawButton(fireWinch1.GetVar(2)))
 				{
-					winchTime = firePreset3.GetVal();//Ditto
+					winchDistance = firePreset3.GetVal();//Ditto
 					firePhase = 3;//Goes directly to winchdown in firephase
 				}
 				
@@ -141,7 +144,7 @@ public:
 				double curTime = (double)tp.tv_sec + double(double(tp.tv_nsec)*1e-9);
 				double teleopRunTime = curTime - fireStart;
 				
-				//when Kyle presses button, firephase = 0
+				//when Kyle presses button, firephase = 1
 				if(Spyder::GetJoystick(fireButton.GetVar(1))->GetRawButton(fireButton.GetVar(2))
 						&& !firePhase)
 				{
@@ -169,11 +172,13 @@ public:
 						}
 						break;
 					case 3://Winch it back down !
+						winchEncoder.Start();
 						Spyder::GetVictor(motorShoot1.GetVal())->Set(1);
-						if(teleopRunTime >winchTime)//Get actual time
+						if(winchEncoder.GetDistance() >= winchDistance)
 						{
+							winchEncoder.Stop();
+							winchEncoder.Reset();
 							firePhase = 0;
-							fireStart = curTime;
 						}
 						break;
 					case 0://Stop motors after winching
