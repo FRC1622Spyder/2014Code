@@ -11,8 +11,8 @@ private:
 	Spyder::ConfigVar<UINT32> motorShoot1;
 	Spyder::ConfigVar<UINT32> pistonSolenoidExt;
 	Spyder::ConfigVar<UINT32> pistonSolenoidRet;
-	Spyder::ConfigVar<double> firePhase1Time;
-	Spyder::ConfigVar<double> firePhase2Time;
+	Spyder::ConfigVar<double> firePhase1Time;//time for solenoid to extend
+	Spyder::ConfigVar<double> firePhase2Time;//time for solenoid to retract
 	Spyder::ConfigVar<float> firePreset1;//winch distance preset 1
 	Spyder::ConfigVar<float> firePreset2;
 	Spyder::ConfigVar<float> firePreset3;
@@ -112,7 +112,7 @@ public:
 				}
 			}*/
 				break;
-			case Spyder::M_TEST:
+			case Spyder::M_TEST: 
 			case Spyder::M_TELEOP://Tele-operation code here
 			{	
 				Encoder winchEncoder(14,13, true);//encoder constructor
