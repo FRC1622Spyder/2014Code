@@ -32,7 +32,7 @@ class Drive : public Spyder::Subsystem
 	public:
 		
 		Drive() : Spyder::Subsystem("Drive"), leftJoystick("bind_leftDrive", 1, 2),
-				rightJoystick("bind_rightDrive", 2, 2), leftMotor("leftDriveMotor", 2),
+				rightJoystick("bind_rightDrive", 2, 1), leftMotor("leftDriveMotor", 2),
 				rightMotor("rightDriveMotor", 1), leftMotorInv("leftDriveInverted", true),
 				rightMotorInv("rightDriveInverted", false), halfSpeed("bind_halfSpeedDrive", 1, 1),
 				ramp("drive_ramp", 0.666), reversed(false), lastRevBtnVal(false), 
