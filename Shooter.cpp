@@ -11,6 +11,8 @@ private:
 	Spyder::ConfigVar<UINT32> motorShoot1;
 	Spyder::ConfigVar<UINT32> pistonSolenoidExt;
 	Spyder::ConfigVar<UINT32> pistonSolenoidRet;
+	Spyder::ConfigVar<UINT32> encoderChannelA;
+	Spyder::ConfigVar<UINT32> encoderChannelB;
 	Spyder::ConfigVar<double> firePhase1Time;//time for solenoid to extend
 	Spyder::ConfigVar<double> firePhase2Time;//time for solenoid to retract
 	Spyder::ConfigVar<float> firePreset1;//winch distance preset 1
@@ -31,7 +33,8 @@ private:
 public:
 	Shooter() : Spyder::Subsystem("Shooter"), motorShoot1("ShooterMotor",4), //Get correct numbers
 			pistonSolenoidExt("shooter_pistonSolenoidExt", 1), 
-			pistonSolenoidRet("shooter_pistonSolenoidRet", 2), firePhase1Time ("shooter_firetime1", 1),
+			pistonSolenoidRet("shooter_pistonSolenoidRet", 2), encoderChannelA("shooterEncoder_A_val", 14),
+			encoderChannelB("shooterEncoder_B_val", 13),firePhase1Time ("shooter_firetime1", 1),
 			firePhase2Time("shooter_firetime2", 1), firePreset1("winch_distance_preset1", 20),
 			firePreset2("winch_distance_preset2", 15),firePreset3("winch_distance_preset3", 10),
 			fireButton("bind_shooterFire1", 3, 2), fireWinch1("bind_winch_pos1", 3, 1), 
@@ -115,7 +118,7 @@ public:
 			case Spyder::M_TEST: 
 			case Spyder::M_TELEOP://Tele-operation code here
 			{	
-				Encoder winchEncoder(14,13, true);//encoder constructor
+				Encoder winchEncoder(encoderChannelA.GetVal(),encoderChannelB.GetVal(), true);//encoder constructor
 				winchEncoder.SetDistancePerPulse(3.14);
 				
 				if(Spyder::GetJoystick(fireWinch1.GetVar(1))->GetRawButton(fireWinch1.GetVar(2)))
