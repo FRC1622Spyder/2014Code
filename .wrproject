@@ -26,6 +26,10 @@
             <listAttribute key="BLD::Info|Incl|PPC603gnu">
                 <stringAttribute value="-I$(WIND_BASE)/target/h"/>
                 <stringAttribute value="-I$(WIND_BASE)/target/h/wrn/coreip"/>
+                <stringAttribute value="-I$(WIND_BASE)/target/h/WPILib"/>
+            </listAttribute>
+            <listAttribute key="BLD::Info|Libs|PPC603gnu">
+                <stringAttribute value="-l $(WIND_BASE)/target/lib/WPILib.a"/>
             </listAttribute>
             <listAttribute key="BLD::Info|Macros">
                 <stringAttribute value="VX_CPU_FAMILY"/>
@@ -236,10 +240,24 @@
         <buildtarget buildtool="Linker" name="2014Code" passed="false" targetname="2014Code">
             <attributes>
                 <mapAttribute>
+<<<<<<< HEAD
+=======
+                    <listAttribute key="BLD::Info|Incl|PPC603gnu">
+                        <stringAttribute value="-I$(WIND_BASE)/target/h"/>
+                        <stringAttribute value="-I$(WIND_BASE)/target/h/WPILib"/>
+                        <stringAttribute value="-I$(WIND_BASE)/target/h/wrn/coreip"/>
+                    </listAttribute>
+>>>>>>> origin/drive
                     <listAttribute key="BLD::Info|Libs|PPC603gnu">
                         <stringAttribute value="$(WIND_BASE)/target/lib/WPILib.a"/>
                     </listAttribute>
                     <stringAttribute key="BLD::Info|Macro|CC_ARCH_SPEC|value|PPC603gnu" value="-mcpu=603 -mstrict-align -mno-implicit-fp -mlongcall"/>
+<<<<<<< HEAD
+=======
+                    <listAttribute key="BuildSupportForBuildSpecs">
+                        <stringAttribute value="PPC603gnu"/>
+                    </listAttribute>
+>>>>>>> origin/drive
                 </mapAttribute>
             </attributes>
             <contents>
@@ -264,6 +282,10 @@
                     </listAttribute>
                     <listAttribute key="BLD::Info|Libs|PPC603gnu">
                         <stringAttribute value="$(WIND_BASE)/target/lib/WPILib.a"/>
+                    </listAttribute>
+                    <stringAttribute key="BLD::Info|Macro|CC_ARCH_SPEC|value|PPC603gnu" value="-mcpu=603 -mstrict-align -mno-implicit-fp -mlongcall"/>
+                    <listAttribute key="BuildSupportForBuildSpecs">
+                        <stringAttribute value="PPC603gnu"/>
                     </listAttribute>
                 </mapAttribute>
             </attributes>
