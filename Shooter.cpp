@@ -2,7 +2,7 @@
 #include "WPIObjMgr.h"
 #include "Config.h"
 #include "Console.h"
-#include "Encoder.h"
+#include "MyEncoder.h"
 #include <cmath>
 #include <iostream>
 
@@ -14,6 +14,7 @@ private:
 	Spyder::ConfigVar<UINT32> pistonSolenoidRet;
 	Spyder::ConfigVar<UINT32> encoderChannelA;
 	Spyder::ConfigVar<UINT32> encoderChannelB;
+	Spyder::ConfigVar<UINT32> limitPort;
 	Spyder::ConfigVar<double> firePhase1Time;//time for solenoid to extend
 	Spyder::ConfigVar<double> firePhase2Time;//time for solenoid to retract
 	Spyder::ConfigVar<float> firePreset1;//winch distance preset 1
@@ -36,9 +37,10 @@ public:
 	Shooter() : Spyder::Subsystem("Shooter"), motorShoot1("ShooterMotor",4), //Get correct numbers
 			pistonSolenoidExt("shooter_pistonSolenoidExt", 1), 
 			pistonSolenoidRet("shooter_pistonSolenoidRet", 2), encoderChannelA("shooterEncoder_A_val", 14),
-			encoderChannelB("shooterEncoder_B_val", 13),firePhase1Time ("shooter_firetime1", 1),
-			firePhase2Time("shooter_firetime2", 1), firePreset1("winch_distance_preset1", 20),
-			firePreset2("winch_distance_preset2", 15),firePreset3("winch_distance_preset3", 10),
+			encoderChannelB("shooterEncoder_B_val", 13), limitPort ("shooter_limitSwitch_val", 12),
+			firePhase1Time ("shooter_firetime1", 1), firePhase2Time("shooter_firetime2", 1), 
+			firePreset1("winch_distance_preset1", 20), firePreset2("winch_distance_preset2", 15),
+			firePreset3("winch_distance_preset3", 10),
 			fireButton("bind_shooterFire1", 3, 2), fireWinch1("bind_winch_pos1", 3, 1), 
 			fireWinch2("bind_winch_pos2", 3, 3), fireWinch3("bind_winch_pos3", 3, 4),
 			firePhase(0), fireStart(0),autofireStart(0),autofirePhase(0), winchDistance(0), 
@@ -121,6 +123,12 @@ public:
 			case Spyder::M_TEST: 
 			case Spyder::M_TELEOP://Tele-operation code here
 			{	
+				DigitalIOButton shooter_limitSwitch(limitPort.GetVal());//limit switch
+				if(shooter_limitSwitch.Get())
+				{
+					Spyder::GetVictor(motorShoot1.GetVal())->Set(0);
+				}
+				
 				Spyder::Encoder winchEncoder(encoderChannelA.GetVal(),encoderChannelB.GetVal(), false);//encoder constructor
 				winchEncoder.SetDistancePerPulse(3.14);
 				

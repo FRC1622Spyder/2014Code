@@ -4,8 +4,8 @@
 /* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
 /*----------------------------------------------------------------------------*/
 
-#ifndef QUAD_ENCODER_H_
-#define QUAD_ENCODER_H_
+#ifndef QUAD_ENCODER_H_MY
+#define QUAD_ENCODER_H_MY
 
 #include "ChipObject.h"
 #include "CounterBase.h"
@@ -81,7 +81,7 @@ private:
 	
 	ITable *m_table;
 };
-}
+};
 
 #endif
 

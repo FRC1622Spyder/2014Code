@@ -13,7 +13,8 @@
 
 static Resource *quadEncoders = NULL;
 
-using namespace Spyder;
+namespace Spyder
+{
 
 /**
  * Common initialization code for Encoders.
@@ -548,3 +549,4 @@ ITable * Encoder::GetTable() {
 	return m_table;
 }
 
+}
