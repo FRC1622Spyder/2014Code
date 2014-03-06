@@ -2,6 +2,7 @@
 #include "WPIObjMgr.h"
 #include "Config.h"
 #include "Console.h"
+#include "Encoder.h"
 #include <cmath>
 #include <iostream>
 
@@ -120,7 +121,7 @@ public:
 			case Spyder::M_TEST: 
 			case Spyder::M_TELEOP://Tele-operation code here
 			{	
-				Encoder winchEncoder(encoderChannelA.GetVal(),encoderChannelB.GetVal(), false);//encoder constructor
+				Spyder::Encoder winchEncoder(encoderChannelA.GetVal(),encoderChannelB.GetVal(), false);//encoder constructor
 				winchEncoder.SetDistancePerPulse(3.14);
 				
 				if(Spyder::GetJoystick(fireWinch1.GetVar(1))->GetRawButton(fireWinch1.GetVar(2)))
