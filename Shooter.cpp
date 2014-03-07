@@ -34,6 +34,7 @@ private:
 	double winchDistance;//temp variable for storing fire presets
 	double encoderDistance;
 	bool encoderStart;
+	
 public:
 	Shooter() : Spyder::Subsystem("Shooter"), motorShoot1("ShooterMotor",4), //Get correct numbers
 			pistonSolenoidExt("shooter_pistonSolenoidExt", 1), 

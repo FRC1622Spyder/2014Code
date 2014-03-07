@@ -1,7 +1,8 @@
 #include "Subsystem.h"
 #include "WPIObjMgr.h"
 #include "Config.h"
-#include <math.h>
+#include "Console.h"
+#include "MyEncoder.h"
 #include <iostream>
 #include <cmath>
 
@@ -25,10 +26,12 @@ class Drive : public Spyder::Subsystem
 		bool lastRevBtnVal;
 		Spyder::TwoIntConfig reverseBtn;
 		
-		Spyder::ConfigVar<float> autospeed;
 		Spyder::ConfigVar<float> autotime;
+		Spyder::TwoIntConfig leftDrive_encoder;
+		Spyder::ConfigVar<bool> leftDrive_encoder_inverse;
+		Spyder::ConfigVar<double> auto_runDistance;
 		double driveStart;
-	
+		unsigned char autoPhase;
 	public:
 		
 		Drive() : Spyder::Subsystem("Drive"), leftJoystick("bind_leftDrive", 1, 2),
@@ -36,8 +39,10 @@ class Drive : public Spyder::Subsystem
 				rightMotor("rightDriveMotor", 1), leftMotorInv("leftDriveInverted", true),
 				rightMotorInv("rightDriveInverted", false), halfSpeed("bind_halfSpeedDrive", 1, 1),
 				ramp("drive_ramp", 0.666), reversed(false), lastRevBtnVal(false), 
-				reverseBtn("bind_driveReverse", 2, 3), autospeed("auto_run_speed",127.f),  
-				autotime("autonomous_run_time",10000.0f), driveStart(0)
+				reverseBtn("bind_driveReverse", 2, 3),autotime("autonomous_run_time",10000.0f), 
+				leftDrive_encoder("drive_leftEncoder_vals", 4 ,5), 
+				leftDrive_encoder_inverse("drive_leftEncoder_inverse", 0),
+				auto_runDistance("drive_autoDistance", 10), driveStart(0), autoPhase(0)
 		{
 		}
 		
@@ -47,6 +52,14 @@ class Drive : public Spyder::Subsystem
 		
 		virtual void Init(Spyder::RunModes runmode)
 		{
+			switch(runmode)
+			{
+				case Spyder::M_AUTO:
+					autoPhase = 0;
+					break;
+				default:
+					;
+			}
 		}
 		
 		virtual void Periodic(Spyder::RunModes runmode)
@@ -55,10 +68,35 @@ class Drive : public Spyder::Subsystem
 			float left = 0.0f;
 			Joystick *leftJoy = Spyder::GetJoystick(leftJoystick.GetVar(1));
 			Joystick *rightJoy = Spyder::GetJoystick(rightJoystick.GetVar(1));
+			Encoder *leftDriveEncoder = Spyder::GetEncoder(leftDrive_encoder.GetVar(1),leftDrive_encoder.GetVar(2), leftDrive_encoder_inverse.GetVal());
 			
 			switch(runmode){
 				case Spyder::M_AUTO:
-					struct timespec tp;
+					
+					switch(autoPhase)
+					{
+					case 0:
+						leftDriveEncoder->Start();
+						autoPhase++;
+						//break;
+					case 1:
+						Spyder::GetVictor(leftMotor.GetVal())->Set(-1);
+						Spyder::GetVictor(rightMotor.GetVal())->Set(1);
+						if(leftDriveEncoder->GetDistance()>=auto_runDistance.GetVal())
+						{
+							leftDriveEncoder->Stop();
+							leftDriveEncoder->Reset();
+							Spyder::GetVictor(leftMotor.GetVal())->Set(0);
+							Spyder::GetVictor(rightMotor.GetVal())->Set(0);
+							autoPhase++;
+						}
+						break;
+					case 2:
+						break;
+					}
+					
+					
+					/*struct timespec tp;
 					timespec theTimespec;
 					clock_gettime(CLOCK_REALTIME, &theTimespec);
 					double theTime = theTimespec.tv_sec;
@@ -76,7 +114,7 @@ class Drive : public Spyder::Subsystem
 						Spyder::GetVictor(leftMotor.GetVal())->Set(0);
 						Spyder::GetVictor(rightMotor.GetVal())->Set(0);
 					}
-					
+					*/
 					break;
 				
 				case Spyder::M_DISABLED:
@@ -134,6 +172,7 @@ class Drive : public Spyder::Subsystem
 		
 		virtual void RobotInit()
 		{
+			
 		}
 };
 

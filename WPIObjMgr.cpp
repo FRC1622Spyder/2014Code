@@ -23,6 +23,15 @@ namespace Spyder
 		}
 		return s_victors[channel];
 	}
+	Encoder* GetEncoder(UINT32 aChannel, UINT32 bChannel, bool inverse)
+	{
+		static std::map<UINT32, Encoder*> s_encoders;
+		if(!s_encoders[aChannel])
+		{
+			s_encoders[aChannel] = new Encoder(aChannel, bChannel, inverse);
+		}
+		return s_encoders[aChannel];
+	}
 	
 	double GetDeadzone()
 	{
