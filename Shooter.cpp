@@ -191,6 +191,8 @@ public:
 						}
 						break;
 					case 3://Winch it back down !
+						//Spyder::GetSolenoid(pistonSolenoidExt.GetVal())->Set(false);
+						//Spyder::GetSolenoid(pistonSolenoidRet.GetVal())->Set(true);
 						if(encoderStart == 1)//initialize encoder
 						{
 							winchEncoder.Start();
@@ -203,7 +205,7 @@ public:
 							encoderDistance += winchEncoder.GetDistance();
 							Spyder::GetVictor(motorShoot1.GetVal())->Set(1);
 							std::cout<<encoderDistance<<std::endl;
-							if(encoderDistance >= winchDistance)
+							if(encoderDistance >= winchDistance || shooter_limitSwitch.Get())
 							{
 								winchEncoder.Stop();
 								winchEncoder.Reset();
@@ -212,6 +214,8 @@ public:
 						}
 						break;
 					case 0://Stop motors after winching
+						Spyder::GetSolenoid(pistonSolenoidExt.GetVal())->Set(false);
+						Spyder::GetSolenoid(pistonSolenoidRet.GetVal())->Set(true);
 						Spyder::GetVictor(motorShoot1.GetVal())->Set(0);
 						fireStart = curTime;
 						break;
