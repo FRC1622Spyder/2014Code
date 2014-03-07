@@ -61,9 +61,10 @@ public:
 		switch(runmode)
 		{
 		case Spyder::M_AUTO:
-			firePhase = 0;
+			autofirePhase = 0;
 			clock_gettime(CLOCK_REALTIME, &tp);
 			autofireStart = (double)tp.tv_sec + double(double(tp.tv_nsec)*1e-9);
+			
 			break;
 		case Spyder::M_TELEOP:
 			firePhase = 0;
@@ -96,7 +97,7 @@ public:
 				clock_gettime(CLOCK_REALTIME, &theTimespec);
 				double curTime = theTimespec.tv_sec;
 				curTime+=theTimespec.tv_nsec*1e-9;
-				double autoRunTime = curTime - fireStart;
+				double autoRunTime = curTime - autofireStart;
 				
 				switch(autofirePhase)
 				{
@@ -110,7 +111,7 @@ public:
 					}
 					break;
 				case 1://wait for drive to finish
-					autoWaitTime_temp= autoWaitTime1.GetVal()-autofireStart;//autoWaitTime1 will be set to the time it takes for drive to fully stop
+					autoWaitTime_temp= autoWaitTime1.GetVal();//autoWaitTime1 will be set to the time it takes for drive to fully stop
 					if(autoRunTime >= autoWaitTime_temp)
 					{
 						autofireStart= curTime;
@@ -145,11 +146,6 @@ public:
 			case Spyder::M_TELEOP://Tele-operation code here
 			{	
 				DigitalInput shooter_limitSwitch(limitPort.GetVal());//limit switch
-				if(shooter_limitSwitch.Get())
-				{
-					Spyder::GetVictor(motorShoot1.GetVal())->Set(0);
-					return;
-				}
 				
 				if(Spyder::GetJoystick(fireWinch1.GetVar(1))->GetRawButton(fireWinch1.GetVar(2)))
 				{
@@ -213,14 +209,14 @@ public:
 						}
 						break;
 					case 3://Winch it back down !
-						//Spyder::GetSolenoid(pistonSolenoidExt.GetVal())->Set(false);
-						//Spyder::GetSolenoid(pistonSolenoidRet.GetVal())->Set(true);
+						Spyder::GetSolenoid(pistonSolenoidExt.GetVal())->Set(false);
+						Spyder::GetSolenoid(pistonSolenoidRet.GetVal())->Set(true);
 						if(encoderStart == 1)//initialize encoder
 						{
 							winchEncoder->Start();
 							encoderStart = 0;
 						}
-						else//encoder should now count correctly
+						else //encoder should now count correctly
 						{
 							Spyder::GetVictor(motorShoot1.GetVal())->Set(1);
 							//std::cout<<winchEncoder->GetDistance<<std::endl;
