@@ -43,8 +43,8 @@ public:
 					Spyder::GetVictor(arm.GetVal())->Set(0);	
 					break;
 				case Spyder::M_AUTO:
-					//Spyder::GetSolenoid(extendSol.GetVal())->Set(true);
-					//Spyder::GetSolenoid(releaseSol.GetVal())->Set(false);
+					Spyder::GetSolenoid(extendSol.GetVal())->Set(true);
+					Spyder::GetSolenoid(releaseSol.GetVal())->Set(false);
 					break;
 				case Spyder::M_TELEOP:
 					int pickSwitch;

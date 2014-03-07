@@ -72,7 +72,6 @@ class Drive : public Spyder::Subsystem
 			
 			switch(runmode){
 				case Spyder::M_AUTO:
-					
 					switch(autoPhase)
 					{
 					case 0:
