@@ -43,7 +43,7 @@ class RobotMain : public IterativeRobot
 				#endif
 			}
 			
-			compr = new Compressor(2, 3);
+			compr = new Compressor(1, 7);
 			Spyder::Console *console = Spyder::Console::GetSingleton();
 			console->Connect("10.16.22.5", 1140);
 		}

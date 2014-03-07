@@ -20,6 +20,7 @@ private:
 	Spyder::ConfigVar<float> firePreset1;//winch distance preset 1
 	Spyder::ConfigVar<float> firePreset2;
 	Spyder::ConfigVar<float> firePreset3;
+	Spyder::ConfigVar<bool> encoderReverse;
 
 	Spyder::TwoIntConfig fireButton;
 	Spyder::TwoIntConfig fireWinch1;//winch button preset1
@@ -40,7 +41,7 @@ public:
 			encoderChannelB("shooterEncoder_B_val", 13), limitPort ("shooter_limitSwitch_val", 12),
 			firePhase1Time ("shooter_firetime1", 1), firePhase2Time("shooter_firetime2", 1), 
 			firePreset1("winch_distance_preset1", 20), firePreset2("winch_distance_preset2", 15),
-			firePreset3("winch_distance_preset3", 10),
+			firePreset3("winch_distance_preset3", 10), encoderReverse("encoder_reverse_val", 1),
 			fireButton("bind_shooterFire1", 3, 2), fireWinch1("bind_winch_pos1", 3, 1), 
 			fireWinch2("bind_winch_pos2", 3, 3), fireWinch3("bind_winch_pos3", 3, 4),
 			firePhase(0), fireStart(0),autofireStart(0),autofirePhase(0), winchDistance(0), 
@@ -123,13 +124,14 @@ public:
 			case Spyder::M_TEST: 
 			case Spyder::M_TELEOP://Tele-operation code here
 			{	
-				DigitalIOButton shooter_limitSwitch(limitPort.GetVal());//limit switch
+				DigitalInput shooter_limitSwitch(limitPort.GetVal());//limit switch
 				if(shooter_limitSwitch.Get())
 				{
 					Spyder::GetVictor(motorShoot1.GetVal())->Set(0);
+					return;
 				}
 				
-				Spyder::Encoder winchEncoder(encoderChannelA.GetVal(),encoderChannelB.GetVal(), false);//encoder constructor
+				Spyder::Encoder winchEncoder(encoderChannelA.GetVal(),encoderChannelB.GetVal(), encoderReverse.GetVal());//encoder constructor
 				winchEncoder.SetDistancePerPulse(3.14);
 				
 				if(Spyder::GetJoystick(fireWinch1.GetVar(1))->GetRawButton(fireWinch1.GetVar(2)))
@@ -153,12 +155,10 @@ public:
 					firePhase = 3;//Goes directly to winchdown in firephase
 				}
 				
-				struct timespec tp;
 				timespec theTimespec;
 				clock_gettime(CLOCK_REALTIME, &theTimespec);
-				double theTime = theTimespec.tv_sec;
-				theTime+=theTimespec.tv_nsec*1e-9;
-				double curTime = (double)tp.tv_sec + double(double(tp.tv_nsec)*1e-9);
+				double curTime = theTimespec.tv_sec;
+				curTime+=theTimespec.tv_nsec*1e-9;
 				double teleopRunTime = curTime - fireStart;
 				
 				//when Kyle presses button, firephase = 1
@@ -166,6 +166,7 @@ public:
 						&& !firePhase)
 				{
 					firePhase = 1;
+					fireStart = curTime;
 				}
 					
 				switch(firePhase)//meant to fire then reset
@@ -193,11 +194,12 @@ public:
 						{
 							winchEncoder.Start();
 							winchEncoder.Reset();
+							encoderDistance = 0;
 							encoderStart = 0;
 						}
 						else//encoder should now count correctly
 						{
-							encoderDistance = winchEncoder.GetDistance();
+							encoderDistance += winchEncoder.GetDistance();
 							Spyder::GetVictor(motorShoot1.GetVal())->Set(1);
 							std::cout<<encoderDistance<<std::endl;
 							if(encoderDistance >= winchDistance)
