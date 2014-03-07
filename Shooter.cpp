@@ -78,6 +78,7 @@ public:
 	virtual void Periodic(Spyder::RunModes runmode)//CHECK IF JOYSTICK IS POS/NEG
 	{
 		Encoder *winchEncoder = Spyder::GetEncoder(encoderChannelA.GetVal(),encoderChannelB.GetVal(), encoderReverse.GetVal());
+		winchEncoder->SetDistancePerPulse(3.141592654);
 		switch(runmode)//Winch motor can only drive forwards
 		{
 			case Spyder::M_DISABLED://disabled code here
@@ -149,7 +150,6 @@ public:
 					Spyder::GetVictor(motorShoot1.GetVal())->Set(0);
 					return;
 				}
-				winchEncoder->SetDistancePerPulse(3.14);
 				
 				if(Spyder::GetJoystick(fireWinch1.GetVar(1))->GetRawButton(fireWinch1.GetVar(2)))
 				{
