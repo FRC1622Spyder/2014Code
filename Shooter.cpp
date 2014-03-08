@@ -79,7 +79,7 @@ public:
 	virtual void Periodic(Spyder::RunModes runmode)//CHECK IF JOYSTICK IS POS/NEG
 	{
 		Encoder *winchEncoder = Spyder::GetEncoder(encoderChannelA.GetVal(),encoderChannelB.GetVal(), encoderReverse.GetVal());
-		winchEncoder->SetDistancePerPulse(3.141592654);
+		winchEncoder->SetDistancePerPulse(3.141592654/1024);
 		switch(runmode)//Winch motor can only drive forwards
 		{
 			case Spyder::M_DISABLED://disabled code here
@@ -219,7 +219,7 @@ public:
 						else //encoder should now count correctly
 						{
 							Spyder::GetVictor(motorShoot1.GetVal())->Set(1);
-							//std::cout<<winchEncoder->GetDistance<<std::endl;
+							std::cout<<winchEncoder->GetDistance()<<std::endl;
 							if(winchEncoder->GetDistance() >= winchDistance || shooter_limitSwitch.Get())
 							{
 								winchEncoder->Stop();

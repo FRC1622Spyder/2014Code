@@ -69,7 +69,7 @@ class Drive : public Spyder::Subsystem
 			Joystick *leftJoy = Spyder::GetJoystick(leftJoystick.GetVar(1));
 			Joystick *rightJoy = Spyder::GetJoystick(rightJoystick.GetVar(1));
 			Encoder *leftDriveEncoder = Spyder::GetEncoder(leftDrive_encoder.GetVar(1),leftDrive_encoder.GetVar(2), leftDrive_encoder_inverse.GetVal());
-			
+			leftDriveEncoder->SetDistancePerPulse(12.56);
 			switch(runmode){
 				case Spyder::M_AUTO:
 					switch(autoPhase)
@@ -81,6 +81,7 @@ class Drive : public Spyder::Subsystem
 					case 1:
 						Spyder::GetVictor(leftMotor.GetVal())->Set(-1);
 						Spyder::GetVictor(rightMotor.GetVal())->Set(1);
+						std::cout<<leftDriveEncoder->GetDistance()<<std::endl;
 						if(leftDriveEncoder->GetDistance()>=auto_runDistance.GetVal())
 						{
 							leftDriveEncoder->Stop();
@@ -93,27 +94,6 @@ class Drive : public Spyder::Subsystem
 					case 2:
 						break;
 					}
-					
-					
-					/*struct timespec tp;
-					timespec theTimespec;
-					clock_gettime(CLOCK_REALTIME, &theTimespec);
-					double theTime = theTimespec.tv_sec;
-					theTime+=theTimespec.tv_nsec*1e-9;
-					double curTime = (double)tp.tv_sec + double(double(tp.tv_nsec)*1e-9);
-					double teleopRunTime = curTime - driveStart;
-					
-					if(teleopRunTime < autotime.GetVal())
-					{
-						Spyder::GetVictor(leftMotor.GetVal())->Set(-autospeed.GetVal());
-						Spyder::GetVictor(rightMotor.GetVal())->Set(autospeed.GetVal());
-					}
-					else
-					{
-						Spyder::GetVictor(leftMotor.GetVal())->Set(0);
-						Spyder::GetVictor(rightMotor.GetVal())->Set(0);
-					}
-					*/
 					break;
 				
 				case Spyder::M_DISABLED:
