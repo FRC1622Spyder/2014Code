@@ -69,7 +69,7 @@ class Drive : public Spyder::Subsystem
 			Joystick *leftJoy = Spyder::GetJoystick(leftJoystick.GetVar(1));
 			Joystick *rightJoy = Spyder::GetJoystick(rightJoystick.GetVar(1));
 			Encoder *leftDriveEncoder = Spyder::GetEncoder(leftDrive_encoder.GetVar(1),leftDrive_encoder.GetVar(2), leftDrive_encoder_inverse.GetVal());
-			leftDriveEncoder->SetDistancePerPulse(12.56);
+			leftDriveEncoder->SetDistancePerPulse(12.56/1024);
 			switch(runmode){
 				case Spyder::M_AUTO:
 					switch(autoPhase)
@@ -79,8 +79,8 @@ class Drive : public Spyder::Subsystem
 						autoPhase++;
 						//break;
 					case 1:
-						Spyder::GetVictor(leftMotor.GetVal())->Set(-1);
-						Spyder::GetVictor(rightMotor.GetVal())->Set(1);
+						Spyder::GetVictor(leftMotor.GetVal())->Set(1);
+						Spyder::GetVictor(rightMotor.GetVal())->Set(-1);
 						std::cout<<leftDriveEncoder->GetDistance()<<std::endl;
 						if(leftDriveEncoder->GetDistance()>=auto_runDistance.GetVal())
 						{
