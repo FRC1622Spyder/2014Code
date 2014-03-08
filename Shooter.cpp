@@ -36,7 +36,7 @@ private:
 	double autoWaitTime_temp;
 	
 public:
-	Shooter() : Spyder::Subsystem("Shooter"), motorShoot1("ShooterMotor",4), //Get correct numbers
+	Shooter() : Spyder::Subsystem("Shooter"), motorShoot1("ShooterMotor",4), //#1 is joystick, #2 is button
 			pistonSolenoidExt("shooter_pistonSolenoidExt", 1), 
 			pistonSolenoidRet("shooter_pistonSolenoidRet", 2), encoderChannelA("shooterEncoder_A_val", 14),
 			encoderChannelB("shooterEncoder_B_val", 13), limitPort ("shooter_limitSwitch_val", 12),
@@ -64,7 +64,6 @@ public:
 			autofirePhase = 0;
 			clock_gettime(CLOCK_REALTIME, &tp);
 			autofireStart = (double)tp.tv_sec + double(double(tp.tv_nsec)*1e-9);
-			
 			break;
 		case Spyder::M_TELEOP:
 			firePhase = 0;
@@ -101,7 +100,11 @@ public:
 				
 				switch(autofirePhase)
 				{
-				case 0://only if not winched down
+				case 0:
+					winchEncoder->Reset();
+					winchEncoder->Start();
+					autofirePhase++;
+				case 1://only if not winched down
 					Spyder::GetVictor(motorShoot1.GetVal())->Set(1);
 					if(winchEncoder->GetDistance() >= winchDistance || shooter_limitSwitch.Get())
 					{
@@ -110,7 +113,7 @@ public:
 						autofirePhase++;
 					}
 					break;
-				case 1://wait for drive to finish
+				case 2://wait for drive to finish
 					autoWaitTime_temp= autoWaitTime1.GetVal();//autoWaitTime1 will be set to the time it takes for drive to fully stop
 					if(autoRunTime >= autoWaitTime_temp)
 					{
@@ -118,7 +121,7 @@ public:
 						autofirePhase++;
 					}
 					break;
-				case 2://FIRE
+				case 3://FIRE
 					Spyder::GetSolenoid(pistonSolenoidRet.GetVal())->Set(false);
 					Spyder::GetSolenoid(pistonSolenoidExt.GetVal())->Set(true);
 					if(autoRunTime > firePhase1Time.GetVal())
@@ -127,7 +130,7 @@ public:
 						autofirePhase++;
 					}
 					break;
-				case 3://Re-engage the winch
+				case 4://Re-engage the winch
 					Spyder::GetSolenoid(pistonSolenoidExt.GetVal())->Set(false);
 					Spyder::GetSolenoid(pistonSolenoidRet.GetVal())->Set(true);
 					if(autoRunTime > firePhase1Time.GetVal())
@@ -136,9 +139,21 @@ public:
 						autofirePhase++;
 					}
 					break;
-				case 4:
+				case 5:
+					winchEncoder->Reset();
+					winchEncoder->Start();
+					autofirePhase++;
+				case 6:
+					Spyder::GetVictor(motorShoot1.GetVal())->Set(1);
+					if(winchEncoder->GetDistance() >= winchDistance || shooter_limitSwitch.Get())
+					{
+						Spyder::GetVictor(motorShoot1.GetVal())->Set(0);
+						autofireStart = curTime;
+						autofirePhase++;
+					}
 					break;
-				
+				case 7:
+					break;
 				}
 			}
 				break;
@@ -147,7 +162,7 @@ public:
 			{	
 				DigitalInput shooter_limitSwitch(limitPort.GetVal());//limit switch
 				
-				if(Spyder::GetJoystick(fireWinch1.GetVar(1))->GetRawButton(fireWinch1.GetVar(2)))
+				/*if(Spyder::GetJoystick(fireWinch1.GetVar(1))->GetRawButton(fireWinch1.GetVar(2)))
 				{
 					winchDistance = firePreset1.GetVal();//Depends on how much motor spins
 					encoderStart = 1;
@@ -166,7 +181,7 @@ public:
 					winchDistance = firePreset3.GetVal();//Ditto
 					encoderStart  = 1;
 					firePhase = 3;//Goes directly to winchdown in firephase
-				}
+				}*/
 				
 				timespec theTimespec;
 				clock_gettime(CLOCK_REALTIME, &theTimespec);
@@ -179,6 +194,7 @@ public:
 						&& !firePhase)
 				{
 					firePhase = 1;
+					encoderStart = 1;
 					fireStart = curTime;
 				}
 					
@@ -205,7 +221,7 @@ public:
 						if(teleopRunTime >=firePhase1Time.GetVal())
 						{
 							fireStart = curTime;
-							firePhase = 0;
+							firePhase++;
 						}
 						break;
 					case 3://Winch it back down !
@@ -220,7 +236,7 @@ public:
 						{
 							Spyder::GetVictor(motorShoot1.GetVal())->Set(1);
 							std::cout<<winchEncoder->GetDistance()<<std::endl;
-							if(winchEncoder->GetDistance() >= winchDistance || shooter_limitSwitch.Get())
+							if(winchEncoder->GetDistance() >= firePreset3.GetVal() || shooter_limitSwitch.Get())
 							{
 								winchEncoder->Stop();
 								winchEncoder->Reset();
