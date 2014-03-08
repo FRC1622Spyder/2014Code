@@ -79,6 +79,7 @@ class Drive : public Spyder::Subsystem
 						autoPhase++;
 						//break;
 					case 1:
+						
 						Spyder::GetVictor(leftMotor.GetVal())->Set(0.3);
 						Spyder::GetVictor(rightMotor.GetVal())->Set(-0.2);
 						std::cout<<leftDriveEncoder->GetDistance()<<std::endl;
