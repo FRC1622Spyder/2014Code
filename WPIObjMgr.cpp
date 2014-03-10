@@ -14,6 +14,16 @@ namespace Spyder
 		return s_joysticks[port];
 	}
 	
+	Relay* GetRelay(UINT32 channel)
+	{
+		static std::map<UINT32, Relay*> s_relays;
+		if(!s_relays[channel])
+		{
+			s_relays[channel] = new Relay(1, channel, Relay::kBothDirections);
+		}
+		return s_relays[channel];
+	}
+	
 	Victor* GetVictor(UINT32 channel)
 	{
 		static std::map<UINT32, Victor*> s_victors;

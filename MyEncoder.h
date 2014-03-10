@@ -27,60 +27,60 @@ class DigitalSource;
  */
 namespace Spyder
 {
-	class Encoder: public SensorBase, public CounterBase, public PIDSource, public LiveWindowSendable
-	{
-	public:
+class Encoder: public SensorBase, public CounterBase, public PIDSource, public LiveWindowSendable
+{
+public:
+	typedef enum {kDistance, kRate} PIDSourceParameter;
+
+	Encoder(UINT32 aChannel, UINT32 bChannel, bool reverseDirection=false, EncodingType encodingType = k4X);
+	Encoder(UINT8 aModuleNumber, UINT32 aChannel, UINT8 bModuleNumber, UINT32 _bChannel, bool reverseDirection=false, EncodingType encodingType = k4X);
+	Encoder(DigitalSource *aSource, DigitalSource *bSource, bool reverseDirection=false, EncodingType encodingType = k4X);
+	Encoder(DigitalSource &aSource, DigitalSource &bSource, bool reverseDirection=false, EncodingType encodingType = k4X);
+	virtual ~Encoder();
+
+	// CounterBase interface
+	void Start();
+	INT32 Get();
+	INT32 GetRaw();
+	void Reset();
+	void Stop();
+	double GetPeriod();
+	void SetMaxPeriod(double maxPeriod);
+	bool GetStopped();
+	bool GetDirection();
+	double GetDistance();
+	double GetRate();
+	void SetMinRate(double minRate);
+	void SetDistancePerPulse(double distancePerPulse);
+	void SetReverseDirection(bool reverseDirection);
+
+	void SetPIDSourceParameter(PIDSourceParameter pidSource);
+	double PIDGet();
 	
-		Encoder(uint32_t aChannel, uint32_t bChannel, bool reverseDirection=false, EncodingType encodingType = k4X);
-		Encoder(uint8_t aModuleNumber, uint32_t aChannel, uint8_t bModuleNumber, uint32_t _bChannel, bool reverseDirection=false, EncodingType encodingType = k4X);
-		Encoder(DigitalSource *aSource, DigitalSource *bSource, bool reverseDirection=false, EncodingType encodingType = k4X);
-		Encoder(DigitalSource &aSource, DigitalSource &bSource, bool reverseDirection=false, EncodingType encodingType = k4X);
-		virtual ~Encoder();
+	void UpdateTable();
+	void StartLiveWindowMode();
+	void StopLiveWindowMode();
+	std::string GetSmartDashboardType();
+	void InitTable(ITable *subTable);
+	ITable * GetTable();
+
+private:
+	void InitEncoder(bool _reverseDirection, EncodingType encodingType);
+	double DecodingScaleFactor();
+
+	DigitalSource *m_aSource;		// the A phase of the quad encoder
+	DigitalSource *m_bSource;		// the B phase of the quad encoder
+	bool m_allocatedASource;		// was the A source allocated locally?
+	bool m_allocatedBSource;		// was the B source allocated locally?
+	tEncoder* m_encoder;
+	UINT8 m_index;
+	double m_distancePerPulse;		// distance of travel for each encoder tick
+	Counter *m_counter;				// Counter object for 1x and 2x encoding
+	EncodingType m_encodingType;	// Encoding type
+	PIDSourceParameter m_pidSource;// Encoder parameter that sources a PID controller
 	
-		// CounterBase interface
-		void Start();
-		int32_t Get();
-		int32_t GetRaw();
-		void Reset();
-		void Stop();
-		double GetPeriod();
-		void SetMaxPeriod(double maxPeriod);
-		bool GetStopped();
-		bool GetDirection();
-		double GetDistance();
-		double GetRate();
-		void SetMinRate(double minRate);
-		void SetDistancePerPulse(double distancePerPulse);
-		void SetReverseDirection(bool reverseDirection);
-		void SetSamplesToAverage(int samplesToAverage);
-		int GetSamplesToAverage();
-		void SetPIDSourceParameter(PIDSourceParameter pidSource);
-		double PIDGet();
-		
-		void UpdateTable();
-		void StartLiveWindowMode();
-		void StopLiveWindowMode();
-		std::string GetSmartDashboardType();
-		void InitTable(ITable *subTable);
-		ITable * GetTable();
-	
-	private:
-		void InitEncoder(bool _reverseDirection, EncodingType encodingType);
-		double DecodingScaleFactor();
-	
-		DigitalSource *m_aSource;		// the A phase of the quad encoder
-		DigitalSource *m_bSource;		// the B phase of the quad encoder
-		bool m_allocatedASource;		// was the A source allocated locally?
-		bool m_allocatedBSource;		// was the B source allocated locally?
-		tEncoder* m_encoder;
-		uint8_t m_index;
-		double m_distancePerPulse;		// distance of travel for each encoder tick
-		Counter *m_counter;				// Counter object for 1x and 2x encoding
-		EncodingType m_encodingType;	// Encoding type
-		PIDSourceParameter m_pidSource;// Encoder parameter that sources a PID controller
-		
-		ITable *m_table;
-	};
+	ITable *m_table;
+};
 };
 #endif
 
