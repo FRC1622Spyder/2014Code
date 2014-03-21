@@ -263,7 +263,7 @@ INT32 Encoder::GetRaw()
  * 
  * @return Current count from the Encoder adjusted for the 1x, 2x, or 4x scale factor.
  */
-INT32 Encoder::Get()
+int32_t Encoder::Get()
 {
 	if (StatusIsFatal()) return 0;
 	return (INT32) (GetRaw() * DecodingScaleFactor());

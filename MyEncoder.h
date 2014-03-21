@@ -40,7 +40,7 @@ public:
 
 	// CounterBase interface
 	void Start();
-	INT32 Get();
+	int32_t Get();
 	INT32 GetRaw();
 	void Reset();
 	void Stop();
