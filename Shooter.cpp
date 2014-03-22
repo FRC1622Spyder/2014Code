@@ -27,6 +27,10 @@ private:
 	Spyder::TwoIntConfig fireWinch2;
 	Spyder::TwoIntConfig fireWinch3;
 	
+	
+	
+	
+	
 	unsigned char firePhase;
 	double fireStart;
 	float autofireStart;
@@ -34,6 +38,8 @@ private:
 	double winchDistance;//temp variable for storing fire presets
 	bool encoderStart;
 	double autoWaitTime_temp;
+	//backup buttons:
+	Spyder::TwoIntConfig altFireButton;
 	
 public:
 	Shooter() : Spyder::Subsystem("Shooter"), motorShoot1("ShooterMotor",4), //Get correct numbers
@@ -47,7 +53,7 @@ public:
 			fireButton("bind_shooterFire1", 3, 2), fireWinch1("bind_winch_pos1", 3, 1), 
 			fireWinch2("bind_winch_pos2", 3, 3), fireWinch3("bind_winch_pos3", 3, 4),
 			firePhase(0), fireStart(0),autofireStart(0),autofirePhase(0), winchDistance(0), 
-			encoderStart(0), autoWaitTime_temp(0)
+			encoderStart(0), autoWaitTime_temp(0), altFireButton("altFireButton", 1, 2)
 	{
 	}
 	virtual ~Shooter()
@@ -175,7 +181,10 @@ public:
 				double teleopRunTime = curTime - fireStart;
 				
 				//when driver presses button, firephase = 1
-				if(Spyder::GetJoystick(fireButton.GetVar(1))->GetRawButton(fireButton.GetVar(2))
+				if((Spyder::GetJoystick(fireButton.GetVar(1))->
+						GetRawButton(fireButton.GetVar(2))
+						|| Spyder::GetJoystick(altFireButton.GetVar(1))->
+						GetRawButton(altFireButton.GetVar(2)))
 						&& !firePhase)
 				{
 					firePhase = 1;
