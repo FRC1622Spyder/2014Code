@@ -10,6 +10,8 @@ class Drive : public Spyder::Subsystem
 {
 	
 	private:
+		WPIObjMgr* objMan;
+		int encIdx;
 		Spyder::TwoIntConfig leftJoystick;
 		Spyder::TwoIntConfig rightJoystick;
 		
@@ -50,8 +52,14 @@ class Drive : public Spyder::Subsystem
 		{
 		}
 		
-		virtual void Init(Spyder::RunModes runmode)
+		virtual void Init(Spyder::RunModes runmode, WPIObjMgr* objMan_in)
 		{
+			this->objMan = objMan_in;
+			this->encIdx = objMan->addEncoder(
+					leftDrive_encoder.GetVar(1),
+					leftDrive_encoder.GetVar(2), 
+					leftDrive_encoder_inverse.GetVal()
+					);
 			switch(runmode)
 			{
 				case Spyder::M_AUTO:
@@ -66,9 +74,10 @@ class Drive : public Spyder::Subsystem
 		{
 			float right = 0.0f;
 			float left = 0.0f;
-			Joystick *leftJoy = Spyder::GetJoystick(leftJoystick.GetVar(1));
-			Joystick *rightJoy = Spyder::GetJoystick(rightJoystick.GetVar(1));
-			Encoder *leftDriveEncoder = Spyder::GetEncoder(leftDrive_encoder.GetVar(1),leftDrive_encoder.GetVar(2), leftDrive_encoder_inverse.GetVal());
+			
+			Joystick *leftJoy = objMan->GetJoystick(1);
+			Joystick *rightJoy = objMan->GetJoystick(2);
+			Encoder *leftDriveEncoder = objMan->GetEncoder(this->encIdx);
 			leftDriveEncoder->SetDistancePerPulse(12.56/1024);
 			switch(runmode){
 				case Spyder::M_AUTO:
@@ -79,15 +88,15 @@ class Drive : public Spyder::Subsystem
 						autoPhase++;
 						//break;
 					case 1:
-						Spyder::GetVictor(leftMotor.GetVal())->Set(1);
-						Spyder::GetVictor(rightMotor.GetVal())->Set(-1);
+						objMan->GetVictor(leftMotor.GetVal())->Set(1);
+						objMan->GetVictor(rightMotor.GetVal())->Set(-1);
 						std::cout<<leftDriveEncoder->GetDistance()<<std::endl;
 						if(leftDriveEncoder->GetDistance()>=auto_runDistance.GetVal())
 						{
 							leftDriveEncoder->Stop();
 							leftDriveEncoder->Reset();
-							Spyder::GetVictor(leftMotor.GetVal())->Set(0);
-							Spyder::GetVictor(rightMotor.GetVal())->Set(0);
+							objMan->GetVictor(leftMotor.GetVal())->Set(0);
+							objMan->GetVictor(rightMotor.GetVal())->Set(0);
 							autoPhase++;
 						}
 						break;
@@ -97,8 +106,8 @@ class Drive : public Spyder::Subsystem
 					break;
 				
 				case Spyder::M_DISABLED:
-					Spyder::GetVictor(leftMotor.GetVal())->Set(0);
-					Spyder::GetVictor(leftMotor.GetVal())->Set(0);
+					objMan->GetVictor(leftMotor.GetVal())->Set(0);
+					objMan->GetVictor(leftMotor.GetVal())->Set(0);
 					break;
 					
 				case Spyder::M_TELEOP:
@@ -117,18 +126,18 @@ class Drive : public Spyder::Subsystem
 						right *= -1;
 					}
 					
-					if(Spyder::GetJoystick(halfSpeed.GetVar(1))->GetRawButton(halfSpeed.GetVar(2)))
+					if(objMan->GetJoystick(halfSpeed.GetVar(1))->GetRawButton(halfSpeed.GetVar(2)))
 					{
 						left /= 2.f;
 						right /= 2.f;
 					}
 					
-					if(Spyder::GetJoystick(reverseBtn.GetVar(1))->GetRawButton(reverseBtn.GetVar(2)) && !lastRevBtnVal)
+					if(objMan->GetJoystick(reverseBtn.GetVar(1))->GetRawButton(reverseBtn.GetVar(2)) && !lastRevBtnVal)
 					{
 						lastRevBtnVal = true;
 						reversed = !reversed;
 					}
-					lastRevBtnVal = Spyder::GetJoystick(reverseBtn.GetVar(1))->GetRawButton(reverseBtn.GetVar(2));
+					lastRevBtnVal = objMan->GetJoystick(reverseBtn.GetVar(1))->GetRawButton(reverseBtn.GetVar(2));
 					
 					if(reversed)
 					{
@@ -137,13 +146,13 @@ class Drive : public Spyder::Subsystem
 						right = temp;
 					}
 					
-					Spyder::GetVictor(leftMotor.GetVal())->Set(left);
-					Spyder::GetVictor(rightMotor.GetVal())->Set(right);
+					objMan->GetVictor(leftMotor.GetVal())->Set(left);
+					objMan->GetVictor(rightMotor.GetVal())->Set(right);
 					break;
 					
 				default:
-					Spyder::GetVictor(leftMotor.GetVal())->Set(0);
-					Spyder::GetVictor(rightMotor.GetVal())->Set(0);
+					objMan->GetVictor(leftMotor.GetVal())->Set(0);
+					objMan->GetVictor(rightMotor.GetVal())->Set(0);
 					break;
 			}
 			

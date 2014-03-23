@@ -4,58 +4,89 @@
 
 namespace Spyder
 {
-	Joystick* GetJoystick(UINT32 port)
-	{
-		static Joystick* s_joysticks[] = {0, 0, 0, 0};
-		if(!s_joysticks[port])
-		{
-			s_joysticks[port] = new Joystick(port);
-		}
-		return s_joysticks[port];
-	}
-	
-	Relay* GetRelay(UINT32 channel)
-	{
-		static std::map<UINT32, Relay*> s_relays;
-		if(!s_relays[channel])
-		{
-			s_relays[channel] = new Relay(1, channel, Relay::kBothDirections);
-		}
-		return s_relays[channel];
-	}
-	
-	Victor* GetVictor(UINT32 channel)
-	{
-		static std::map<UINT32, Victor*> s_victors;
-		if(!s_victors[channel])
-		{
-			s_victors[channel] = new Victor(1, channel);
-		}
-		return s_victors[channel];
-	}
-	Encoder* GetEncoder(UINT32 aChannel, UINT32 bChannel, bool inverse)
-	{
-		static std::map<UINT32, Encoder*> s_encoders;
-		if(!s_encoders[aChannel])
-		{
-			s_encoders[aChannel] = new Encoder(aChannel, bChannel, inverse);
-		}
-		return s_encoders[aChannel];
-	}
-	
 	double GetDeadzone()
 	{
 		static ConfigVar<double> deadzone("controller_deadzone", 0.15);
 		return deadzone.GetVal();
 	}
-	
-	Solenoid* GetSolenoid(UINT32 channel)
+		
+};	
+	void WPIObjMgr::baseInit()
 	{
-		static std::map<UINT32, Solenoid*> s_solenoids;
-		if(!s_solenoids[channel])
+		for(uint8_t i = 0; i<4; i++) //joystick init
 		{
-			s_solenoids[channel] = new Solenoid(channel);
+			this->m_joysticks[i] = new Joystick((uint32_t)i+1); 
 		}
-		return s_solenoids[channel];
+		for(uint8_t i = 0; i<10;i++)//victors
+		{
+			this->m_victors[i] = new Victor((uint32_t)i);
+		}
+		for(uint8_t i = 0; i<8;i++)//solenoids
+		{
+			this->m_solenoids[i] = new Solenoid((uint32_t)i);
+		}
 	}
-}
+	
+	int WPIObjMgr::addEncoder(UINT32 aChan, UINT32 bChan, bool reverse)
+	{
+		for(uint8_t i=0; i<5;i++)
+		{
+			if(this->m_encoders[i]==NULL)
+			{
+				this->m_encoders[i] = new Encoder(aChan, bChan, reverse);
+				return i; //slot available, return.
+			}
+		}
+		return -1; //no more encoder slots available
+	}
+	
+	WPIObjMgr::WPIObjMgr()
+	{
+		this->baseInit();
+		for(uint8_t i=0; i<8;i++)
+		{
+			this->m_relays[i] = new Relay((uint32_t)i, Relay::kBothDirections);
+		}
+
+		
+	}
+	
+	WPIObjMgr::WPIObjMgr(Spyder::IOCfg config)
+	{
+		this->baseInit();
+		for(uint8_t i = 0; i<8; i++)//relays
+		{
+			this->m_relays[i] = new Relay((uint32_t)i, config.relayModes[i]);
+		}
+		for(uint8_t i=0; i<config.numEncoders;i++) //encoders
+		{
+			this->m_encoders[i] = new Encoder((UINT32) config.aChanels[i], 
+					(UINT32) config.bChanels[i], config.encoderReverse);
+		}
+	}
+	
+	Joystick* WPIObjMgr::GetJoystick(uint8_t port)
+	{
+		return this->m_joysticks[port];
+	}
+	
+	Relay* WPIObjMgr::GetRelay(uint8_t channel)
+	{
+		return this->m_relays[channel];
+	}
+	
+	Victor* WPIObjMgr::GetVictor(uint8_t channel)
+	{
+		return this->m_victors[channel];
+	}
+	
+	Encoder* WPIObjMgr::GetEncoder(uint8_t index)
+	{
+		return this->m_encoders[index];
+	}
+	
+	Solenoid* WPIObjMgr::GetSolenoid(uint8_t channel)
+	{
+		return this->m_solenoids[channel];
+	}
+	

@@ -14,7 +14,9 @@ class RobotMain : public IterativeRobot
 {
 	private:
 		unsigned int usPeriodCounter;
+		Spyder::IOCfg hardwareConfig;
 	public:
+		WPIObjMgr *objMan;
 		virtual void RobotInit()
 		{
 			std::fstream file;
@@ -46,6 +48,12 @@ class RobotMain : public IterativeRobot
 			compr = new Compressor(1, 7);
 			Spyder::Console *console = Spyder::Console::GetSingleton();
 			console->Connect("10.16.22.5", 1140);
+			
+			//hardware configuration structure
+			//and initialization for a lighter 
+			//object manager
+			objMan = new WPIObjMgr();
+			
 		}
 		
 		virtual void DisabledInit()
@@ -58,7 +66,7 @@ class RobotMain : public IterativeRobot
 					timespec start;
 					clock_gettime(CLOCK_REALTIME, &start);
 				#endif
-				subsystems[i]->Init(Spyder::M_DISABLED);
+				subsystems[i]->Init(Spyder::M_DISABLED, objMan);
 				#ifdef PROFILE
 					timespec end;
 					clock_gettime(CLOCK_REALTIME, &end);
@@ -78,7 +86,7 @@ class RobotMain : public IterativeRobot
 					timespec start;
 					clock_gettime(CLOCK_REALTIME, &start);
 				#endif
-				subsystems[i]->Init(Spyder::M_AUTO);
+				subsystems[i]->Init(Spyder::M_AUTO, objMan);
 				#ifdef PROFILE
 					timespec end;
 					clock_gettime(CLOCK_REALTIME, &end);
@@ -91,7 +99,8 @@ class RobotMain : public IterativeRobot
 		
 		virtual void TeleopInit()
 		{
-			if(Spyder::GetJoystick(1)->GetRawButton(9))
+			//if(objMan->GetJoystick(1)->GetRawButton(9))
+			if(objMan->GetJoystick(1)->GetRawButton(9));
 			{
 				std::fstream file;
 				file.open("config.cfg", std::ios_base::in);
@@ -109,7 +118,7 @@ class RobotMain : public IterativeRobot
 					timespec start;
 					clock_gettime(CLOCK_REALTIME, &start);
 				#endif
-				subsystems[i]->Init(Spyder::M_TELEOP);
+				subsystems[i]->Init(Spyder::M_TELEOP, objMan);
 				#ifdef PROFILE
 					timespec end;
 					clock_gettime(CLOCK_REALTIME, &end);
@@ -125,7 +134,7 @@ class RobotMain : public IterativeRobot
 			std::vector<Spyder::Subsystem*> subsystems = Spyder::SubsystemMgr::GetSingleton()->GetSubsystems();
 			for(size_t i = 0; i < subsystems.size(); ++i)
 			{
-				subsystems[i]->Init(Spyder::M_TEST);
+				subsystems[i]->Init(Spyder::M_TEST, objMan);
 			}
 		}
 		

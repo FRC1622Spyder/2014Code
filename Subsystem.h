@@ -1,4 +1,5 @@
 #pragma once
+#include "WPIObjMgr.h"
 #include <string>
 #include <hash_map>
 #include <vector>
@@ -32,7 +33,7 @@ namespace Spyder
 			{
 				return m_strName;
 			}
-			virtual void Init(RunModes runmode) = 0;
+			virtual void Init(RunModes runmode, WPIObjMgr* objMan_in) = 0;
 			virtual void Periodic(RunModes runmode) = 0;
 			virtual void RobotInit() = 0;
 			inline unsigned short GetPeriod()
