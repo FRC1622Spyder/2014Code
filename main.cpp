@@ -14,7 +14,9 @@ class RobotMain : public IterativeRobot
 {
 	private:
 		unsigned int usPeriodCounter;
+		Spyder::IOCfg hardwareConfig;
 	public:
+		WPIObjMgr *objMan;
 		virtual void RobotInit()
 		{
 			std::fstream file;
@@ -46,6 +48,12 @@ class RobotMain : public IterativeRobot
 			compr = new Compressor(1, 7);
 			Spyder::Console *console = Spyder::Console::GetSingleton();
 			console->Connect("10.16.22.5", 1140);
+			
+			//hardware configuration structure
+			//and initialization for a lighter 
+			//object manager
+			objMan = Spyder::WPIObjMgr::GetSingleton();//this->hardwareConfig);
+			
 		}
 		
 		virtual void DisabledInit()
@@ -91,7 +99,8 @@ class RobotMain : public IterativeRobot
 		
 		virtual void TeleopInit()
 		{
-			if(Spyder::GetJoystick(1)->GetRawButton(9))
+			//if(Spyder::GetJoystick(1)->GetRawButton(9))
+			if(objMan->GetJoystick(1)->GetRawButton(9));
 			{
 				std::fstream file;
 				file.open("config.cfg", std::ios_base::in);

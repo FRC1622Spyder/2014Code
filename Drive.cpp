@@ -66,7 +66,8 @@ class Drive : public Spyder::Subsystem
 		{
 			float right = 0.0f;
 			float left = 0.0f;
-			Joystick *leftJoy = Spyder::GetJoystick(leftJoystick.GetVar(1));
+			
+			Joystick *leftJoy = WPIObjMgr::getSingleton();//Spyder::GetJoystick(leftJoystick.GetVar(1));
 			Joystick *rightJoy = Spyder::GetJoystick(rightJoystick.GetVar(1));
 			Encoder *leftDriveEncoder = Spyder::GetEncoder(leftDrive_encoder.GetVar(1),leftDrive_encoder.GetVar(2), leftDrive_encoder_inverse.GetVal());
 			leftDriveEncoder->SetDistancePerPulse(12.56/1024);

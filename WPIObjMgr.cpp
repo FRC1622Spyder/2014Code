@@ -9,8 +9,9 @@ namespace Spyder
 		static ConfigVar<double> deadzone("controller_deadzone", 0.15);
 		return deadzone.GetVal();
 	}
-	
-	WPIObjMgr::baseInit()
+		
+};	
+	void WPIObjMgr::baseInit()
 	{
 		for(uint8_t i = 0; i<4; i++) //joystick init
 		{
@@ -46,14 +47,11 @@ namespace Spyder
 		{
 			this->m_relays[i] = new Relay((uint32_t)i, Relay::kBothDirections);
 		}
-		for(uint8_t i=0; i<5; i++)//yep, these must be initialized later.
-		{
-			this->m_encoders=NULL;
-		}
+
 		
 	}
 	
-	WPIObjMgr::WPIObjMgr(IOCfg config)
+	WPIObjMgr::WPIObjMgr(Spyder::IOCfg config)
 	{
 		this->baseInit();
 		for(uint8_t i = 0; i<8; i++)//relays
@@ -91,4 +89,4 @@ namespace Spyder
 	{
 		return this->m_solenoids[channel];
 	}
-}
+	
