@@ -185,19 +185,14 @@ public:
 				double curTime = theTimespec.tv_sec;
 				curTime+=theTimespec.tv_nsec*1e-9;
 				double teleopRunTime = curTime - fireStart;
-				
-				//when driver presses button, firephase = 1
-//<<<<<<< HEAD
-				//if((Spyder::GetJoystick(fireButton.GetVar(1))->
-				//		GetRawButton(fireButton.GetVar(2))
-				//		|| Spyder::GetJoystick(altFireButton.GetVar(1))->
-				//		GetRawButton(altFireButton.GetVar(2)))
-//=======
-				if((objMan->GetJoystick(fireButton.GetVar(1))->
-						GetRawButton(fireButton.GetVar(2))
-						|| objMan->GetJoystick(altFireButton.GetVar(1))->
-						GetRawButton(altFireButton.GetVar(2)))
 
+				if(
+						(
+								objMan->GetJoystick(fireButton.GetVar(1))->
+								GetRawButton(fireButton.GetVar(2)) ||
+								objMan->GetJoystick(altFireButton.GetVar(1))->
+								GetRawButton(altFireButton.GetVar(2))
+						)
 						&& !firePhase)
 				{
 					firePhase = 1;
@@ -206,53 +201,53 @@ public:
 					
 				switch(firePhase)//meant to fire then reset
 				{
-					case 0://Stop motors after winching OR keep motors from moving in general
-						objMan->GetSolenoid(pistonSolenoidExt.GetVal())->Set(false);
-						objMan->GetSolenoid(pistonSolenoidRet.GetVal())->Set(true);
-						objMan->GetVictor(motorShoot1.GetVal())->Set(0);
+				case 0://Stop motors after winching OR keep motors from moving in general
+					objMan->GetSolenoid(pistonSolenoidExt.GetVal())->Set(false);
+					objMan->GetSolenoid(pistonSolenoidRet.GetVal())->Set(true);
+					objMan->GetVictor(motorShoot1.GetVal())->Set(0);
+					fireStart = curTime;
+					break;
+				case 1://fire!
+					objMan->GetSolenoid(pistonSolenoidRet.GetVal())->Set(false);
+					objMan->GetSolenoid(pistonSolenoidExt.GetVal())->Set(true);
+					if (teleopRunTime >= firePhase1Time.GetVal())
+					{
 						fireStart = curTime;
-						break;
-					case 1://fire!
-						objMan->GetSolenoid(pistonSolenoidRet.GetVal())->Set(false);
-						objMan->GetSolenoid(pistonSolenoidExt.GetVal())->Set(true);
-						if (teleopRunTime >= firePhase1Time.GetVal())
+						firePhase++;
+					}
+					break;
+				case 2://Re-engage the arm!
+					objMan->GetSolenoid(pistonSolenoidExt.GetVal())->Set(false);
+					objMan->GetSolenoid(pistonSolenoidRet.GetVal())->Set(true);
+					if(teleopRunTime >=firePhase1Time.GetVal())
+					{
+						fireStart = curTime;
+						firePhase = 0;
+					}
+					break;
+				case 3://Winch it back down !
+					objMan->GetSolenoid(pistonSolenoidExt.GetVal())->Set(false);
+					objMan->GetSolenoid(pistonSolenoidRet.GetVal())->Set(true);
+					if(encoderStart == 1)//initialize encoder
+					{
+						winchEncoder->Start();
+						encoderStart = 0;
+					}
+					else //encoder should now count correctly
+					{
+						objMan->GetVictor(motorShoot1.GetVal())->Set(1);
+						std::cout<<winchEncoder->GetDistance()<<std::endl;
+						if(winchEncoder->GetDistance() >= winchDistance || shooter_limitSwitch.Get())
 						{
-							fireStart = curTime;
-							firePhase++;
-						}
-						break;
-					case 2://Re-engage the arm!
-						objMan->GetSolenoid(pistonSolenoidExt.GetVal())->Set(false);
-						objMan->GetSolenoid(pistonSolenoidRet.GetVal())->Set(true);
-						if(teleopRunTime >=firePhase1Time.GetVal())
-						{
-							fireStart = curTime;
+							winchEncoder->Stop();
+							winchEncoder->Reset();
 							firePhase = 0;
 						}
-						break;
-					case 3://Winch it back down !
-						objMan->GetSolenoid(pistonSolenoidExt.GetVal())->Set(false);
-						objMan->GetSolenoid(pistonSolenoidRet.GetVal())->Set(true);
-						if(encoderStart == 1)//initialize encoder
-						{
-							winchEncoder->Start();
-							encoderStart = 0;
-						}
-						else //encoder should now count correctly
-						{
-							objMan->GetVictor(motorShoot1.GetVal())->Set(1);
-							std::cout<<winchEncoder->GetDistance()<<std::endl;
-							if(winchEncoder->GetDistance() >= winchDistance || shooter_limitSwitch.Get())
-							{
-								winchEncoder->Stop();
-								winchEncoder->Reset();
-								firePhase = 0;
-							}
-						}
-						break;
+					}
+					break;
 				}
 			}
-				break;
+			break;
 		};
 	}
 	

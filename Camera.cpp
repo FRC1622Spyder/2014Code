@@ -24,4 +24,5 @@ public:
 	{
 	}
 };
+
 Camera camera;

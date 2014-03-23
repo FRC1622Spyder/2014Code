@@ -4,8 +4,6 @@
 namespace Spyder
 {
 	double GetDeadzone(); //shouldn't this go in a utilities file?
-
-
 	struct IOCfg{
 		Relay::Direction relayModes[8];
 		uint8_t numEncoders;
@@ -15,7 +13,6 @@ namespace Spyder
 	};
 };
 class WPIObjMgr {
-	
 	Joystick *m_joysticks[4];
 	Victor *m_victors[10];
 	Solenoid * m_solenoids[8];
@@ -23,7 +20,6 @@ class WPIObjMgr {
 	Relay * m_relays[8];
 	void baseInit(void);
 public:
-	
 	WPIObjMgr();
 	WPIObjMgr(Spyder::IOCfg);
 	int addEncoder(UINT32 aChan, UINT32 bChan, bool reverse);
@@ -32,6 +28,5 @@ public:
 	Victor* GetVictor(uint8_t channel);
 	Solenoid* GetSolenoid(uint8_t channel);
 	Encoder* GetEncoder(uint8_t index);
-	
 };
 

@@ -60,13 +60,19 @@ public:
 				case Spyder::M_TELEOP:
 					int pickSwitch;
 
-					if(objMan->GetJoystick(pickButton_in.GetVar(1))->GetRawButton(pickButton_in.GetVar(2))
-							|| objMan->GetJoystick(altPickButton_in.GetVar(1))->GetRawButton(altPickButton_in.GetVar(2)))
+					if(objMan->GetJoystick(pickButton_in.GetVar(1))->
+							GetRawButton(pickButton_in.GetVar(2)) ||
+							objMan->GetJoystick(altPickButton_in.GetVar(1))->
+							GetRawButton(altPickButton_in.GetVar(2))
+							)
 					{
 						pickSwitch = 1;
 					}
-					if(objMan->GetJoystick(pickButton_out.GetVar(1))->GetRawButton(pickButton_out.GetVar(2))
-							|| objMan->GetJoystick(altPickButton_out.GetVar(1))->GetRawButton(altPickButton_out.GetVar(2)))
+					if(objMan->GetJoystick(pickButton_out.GetVar(1))->
+							GetRawButton(pickButton_out.GetVar(2)) ||
+							objMan->GetJoystick(altPickButton_out.GetVar(1))->
+							GetRawButton(altPickButton_out.GetVar(2))
+							)
 					{
 						pickSwitch = 2;
 					}
@@ -84,16 +90,23 @@ public:
 						break;
 					}
 				
-					if((objMan->GetJoystick(eSol.GetVar(1))->GetRawButton(eSol.GetVar(2))||
-							objMan->GetJoystick(altESol.GetVar(1))->GetRawButton(altESol.GetVar(2)))==true) {
+					if((objMan->GetJoystick(eSol.GetVar(1))->
+							GetRawButton(eSol.GetVar(2)) ||
+							objMan->GetJoystick(altESol.GetVar(1))->
+							GetRawButton(altESol.GetVar(2))
+							) == true) 
+					{
 						objMan->GetSolenoid(extendSol.GetVal())->Set(true);
 						objMan->GetSolenoid(releaseSol.GetVal())->Set(false);
 					}
-					else if((objMan->GetJoystick(rSol.GetVar(1))->GetRawButton(rSol.GetVar(2))||
-							objMan->GetJoystick(altRSol.GetVar(1))->GetRawButton(altRSol.GetVar(2)))==true) {
+					else if((objMan->GetJoystick(rSol.GetVar(1))->
+							GetRawButton(rSol.GetVar(2)) ||
+							objMan->GetJoystick(altRSol.GetVar(1))->
+							GetRawButton(altRSol.GetVar(2))
+							) == true) 
+					{
 						objMan->GetSolenoid(extendSol.GetVal())->Set(false);
 						objMan->GetSolenoid(releaseSol.GetVal())->Set(true);
-
 					}
 					break;
 					

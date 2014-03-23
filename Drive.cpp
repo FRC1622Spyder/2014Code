@@ -8,7 +8,6 @@
 
 class Drive : public Spyder::Subsystem
 {
-	
 	private:
 		WPIObjMgr* objMan;
 		int encIdx;
@@ -160,7 +159,6 @@ class Drive : public Spyder::Subsystem
 		
 		virtual void RobotInit()
 		{
-			
 		}
 };
 

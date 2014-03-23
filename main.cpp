@@ -49,9 +49,7 @@ class RobotMain : public IterativeRobot
 			Spyder::Console *console = Spyder::Console::GetSingleton();
 			console->Connect("10.16.22.5", 1140);
 			
-			//hardware configuration structure
-			//and initialization for a lighter 
-			//object manager
+			//start up the object manager
 			objMan = new WPIObjMgr();
 			
 		}
@@ -99,7 +97,6 @@ class RobotMain : public IterativeRobot
 		
 		virtual void TeleopInit()
 		{
-			//if(objMan->GetJoystick(1)->GetRawButton(9))
 			if(objMan->GetJoystick(1)->GetRawButton(9));
 			{
 				std::fstream file;
@@ -242,6 +239,5 @@ class RobotMain : public IterativeRobot
 		{
 		}
 };
-
 
 START_ROBOT_CLASS(RobotMain);

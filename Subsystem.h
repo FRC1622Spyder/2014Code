@@ -23,7 +23,6 @@ namespace Spyder
 			std::hash_map<std::string, Subsystem*> m_nameToSubsys; 
 	};
 	
-	
 	class Subsystem
 	{
 		public:
