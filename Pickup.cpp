@@ -7,6 +7,7 @@
 
 class Pickup : public Spyder::Subsystem
 {
+		WPIObjMgr *objMan;
 		Spyder::ConfigVar<UINT32> extendSol; 
 		Spyder::ConfigVar<UINT32> releaseSol;
 		Spyder::TwoIntConfig eSol;
@@ -25,12 +26,12 @@ public:
 		{
 		}	
 	
-		virtual void Init(Spyder::RunModes runmode)
-		
+		virtual void Init(Spyder::RunModes runmode, WPIObjMgr *objMan_in)
 		{
-			Spyder::GetSolenoid(extendSol.GetVal())->Set(false);
-			Spyder::GetSolenoid(releaseSol.GetVal())->Set(true);
-			Spyder::GetVictor(arm.GetVal())->Set(0.0f);
+			this->objMan = objMan_in;
+			objMan->GetSolenoid(extendSol.GetVal())->Set(false);
+			objMan->GetSolenoid(releaseSol.GetVal())->Set(true);
+			objMan->GetVictor(arm.GetVal())->Set(0.0f);
 		}
 
 		virtual void Periodic(Spyder::RunModes runmode)
@@ -38,21 +39,21 @@ public:
 			switch(runmode)
 				{
 				case Spyder::M_DISABLED:
-					Spyder::GetSolenoid(extendSol.GetVal())->Set(false);
-					Spyder::GetSolenoid(releaseSol.GetVal())->Set(true);
-					Spyder::GetVictor(arm.GetVal())->Set(0);	
+					objMan->GetSolenoid(extendSol.GetVal())->Set(false);
+					objMan->GetSolenoid(releaseSol.GetVal())->Set(true);
+					objMan->GetVictor(arm.GetVal())->Set(0);	
 					break;
 				case Spyder::M_AUTO:
-					Spyder::GetSolenoid(extendSol.GetVal())->Set(true);
-					Spyder::GetSolenoid(releaseSol.GetVal())->Set(false);
+					objMan->GetSolenoid(extendSol.GetVal())->Set(true);
+					objMan->GetSolenoid(releaseSol.GetVal())->Set(false);
 					break;
 				case Spyder::M_TELEOP:
 					int pickSwitch;
-					if(Spyder::GetJoystick(pickButton_in.GetVar(1))->GetRawButton(pickButton_in.GetVar(2)))
+					if(objMan->GetJoystick(pickButton_in.GetVar(1))->GetRawButton(pickButton_in.GetVar(2)))
 					{
 						pickSwitch = 1;
 					}
-					if(Spyder::GetJoystick(pickButton_out.GetVar(1))->GetRawButton(pickButton_out.GetVar(2)))
+					if(objMan->GetJoystick(pickButton_out.GetVar(1))->GetRawButton(pickButton_out.GetVar(2)))
 					{
 						pickSwitch = 2;
 					}
@@ -60,30 +61,30 @@ public:
 					switch(pickSwitch)
 					{
 					case 1:
-						Spyder::GetVictor(arm.GetVal())->Set(1);
+						objMan->GetVictor(arm.GetVal())->Set(1);
 						break;
 					case 2:
-						Spyder::GetVictor(arm.GetVal())->Set(-1);
+						objMan->GetVictor(arm.GetVal())->Set(-1);
 						break;
 					default:
-						Spyder::GetVictor(arm.GetVal())->Set(0);
+						objMan->GetVictor(arm.GetVal())->Set(0);
 						break;
 					}
 					
-					if(Spyder::GetJoystick(eSol.GetVar(1))->GetRawButton(eSol.GetVar(2))==true) {
-						Spyder::GetSolenoid(extendSol.GetVal())->Set(true);
-						Spyder::GetSolenoid(releaseSol.GetVal())->Set(false);
+					if(objMan->GetJoystick(eSol.GetVar(1))->GetRawButton(eSol.GetVar(2))==true) {
+						objMan->GetSolenoid(extendSol.GetVal())->Set(true);
+						objMan->GetSolenoid(releaseSol.GetVal())->Set(false);
 					}
-					else if(Spyder::GetJoystick(rSol.GetVar(1))->GetRawButton(rSol.GetVar(2))==true) {
-						Spyder::GetSolenoid(extendSol.GetVal())->Set(false);
-						Spyder::GetSolenoid(releaseSol.GetVal())->Set(true);
+					else if(objMan->GetJoystick(rSol.GetVar(1))->GetRawButton(rSol.GetVar(2))==true) {
+						objMan->GetSolenoid(extendSol.GetVal())->Set(false);
+						objMan->GetSolenoid(releaseSol.GetVal())->Set(true);
 					}
 					break;
 					
 				default:
-					Spyder::GetSolenoid(extendSol.GetVal())->Set(false);
-					Spyder::GetSolenoid(releaseSol.GetVal())->Set(true);
-					Spyder::GetVictor(arm.GetVal())->Set(0.0f);
+					objMan->GetSolenoid(extendSol.GetVal())->Set(false);
+					objMan->GetSolenoid(releaseSol.GetVal())->Set(true);
+					objMan->GetVictor(arm.GetVal())->Set(0.0f);
 					break;
 				}
 		}

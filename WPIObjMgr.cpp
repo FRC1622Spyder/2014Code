@@ -27,17 +27,17 @@ namespace Spyder
 		}
 	}
 	
-	bool WPIObjMgr::addEncoder(UINT32 aChan, UINT32 bChan, bool reverse)
+	int WPIObjMgr::addEncoder(UINT32 aChan, UINT32 bChan, bool reverse)
 	{
 		for(uint8_t i=0; i<5;i++)
 		{
 			if(this->m_encoders[i]==NULL)
 			{
 				this->m_encoders[i] = new Encoder(aChan, bChan, reverse);
-				return true; //slot available, return.
+				return i; //slot available, return.
 			}
 		}
-		return false; //no more encoder slots available
+		return -1; //no more encoder slots available
 	}
 	
 	WPIObjMgr::WPIObjMgr()

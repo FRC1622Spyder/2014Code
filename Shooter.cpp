@@ -9,6 +9,8 @@
 class Shooter : public Spyder::Subsystem
 {
 private:
+	int encIdx;
+	WPIObjMgr *objMan;
 	Spyder::ConfigVar<UINT32> motorShoot1;
 	Spyder::ConfigVar<UINT32> pistonSolenoidExt;
 	Spyder::ConfigVar<UINT32> pistonSolenoidRet;
@@ -54,9 +56,13 @@ public:
 	{
 	}
 	
-	virtual void Init(Spyder::RunModes runmode)
+	virtual void Init(Spyder::RunModes runmode, WPIObjMgr *objMan_in)
 	{
-		Spyder::GetVictor(motorShoot1.GetVal())->Set(0);
+		this->objMan=objMan_in;
+		this->encIdx = this->objMan->addEncoder(
+				encoderChannelA.GetVal(),encoderChannelB.GetVal(), 
+				encoderReverse.GetVal());
+		objMan->GetVictor(motorShoot1.GetVal())->Set(0);
 		struct timespec tp;
 		switch(runmode)
 		{
@@ -78,14 +84,14 @@ public:
 	
 	virtual void Periodic(Spyder::RunModes runmode)//CHECK IF JOYSTICK IS POS/NEG
 	{
-		Encoder *winchEncoder = Spyder::GetEncoder(encoderChannelA.GetVal(),encoderChannelB.GetVal(), encoderReverse.GetVal());
+		Encoder *winchEncoder = objMan->GetEncoder(this->encIdx);
 		winchEncoder->SetDistancePerPulse(3.141592654/1024);
 		switch(runmode)//Winch motor can only drive forwards
 		{
 			case Spyder::M_DISABLED://disabled code here
-			{	Spyder::GetVictor(motorShoot1.GetVal())->Set(0);
-				Spyder::GetSolenoid(pistonSolenoidExt.GetVal())->Set(false);
-				Spyder::GetSolenoid(pistonSolenoidRet.GetVal())->Set(true);
+			{	objMan->GetVictor(motorShoot1.GetVal())->Set(0);
+				objMan->GetSolenoid(pistonSolenoidExt.GetVal())->Set(false);
+				objMan->GetSolenoid(pistonSolenoidRet.GetVal())->Set(true);
 			}
 				break;
 			case Spyder::M_AUTO://autonomous code here
@@ -102,10 +108,10 @@ public:
 				switch(autofirePhase)
 				{
 				case 0://only if not winched down
-					Spyder::GetVictor(motorShoot1.GetVal())->Set(1);
+					objMan->GetVictor(motorShoot1.GetVal())->Set(1);
 					if(winchEncoder->GetDistance() >= winchDistance || shooter_limitSwitch.Get())
 					{
-						Spyder::GetVictor(motorShoot1.GetVal())->Set(0);
+						objMan->GetVictor(motorShoot1.GetVal())->Set(0);
 						autofireStart = curTime;
 						autofirePhase++;
 					}
@@ -119,8 +125,8 @@ public:
 					}
 					break;
 				case 2://FIRE
-					Spyder::GetSolenoid(pistonSolenoidRet.GetVal())->Set(false);
-					Spyder::GetSolenoid(pistonSolenoidExt.GetVal())->Set(true);
+					objMan->GetSolenoid(pistonSolenoidRet.GetVal())->Set(false);
+					objMan->GetSolenoid(pistonSolenoidExt.GetVal())->Set(true);
 					if(autoRunTime > firePhase1Time.GetVal())
 					{
 						autofireStart = curTime;
@@ -128,8 +134,8 @@ public:
 					}
 					break;
 				case 3://Re-engage the winch
-					Spyder::GetSolenoid(pistonSolenoidExt.GetVal())->Set(false);
-					Spyder::GetSolenoid(pistonSolenoidRet.GetVal())->Set(true);
+					objMan->GetSolenoid(pistonSolenoidExt.GetVal())->Set(false);
+					objMan->GetSolenoid(pistonSolenoidRet.GetVal())->Set(true);
 					if(autoRunTime > firePhase1Time.GetVal())
 					{
 						autofireStart = curTime;
@@ -147,21 +153,21 @@ public:
 			{	
 				DigitalInput shooter_limitSwitch(limitPort.GetVal());//limit switch
 				
-				if(Spyder::GetJoystick(fireWinch1.GetVar(1))->GetRawButton(fireWinch1.GetVar(2)))
+				if(objMan->GetJoystick(fireWinch1.GetVar(1))->GetRawButton(fireWinch1.GetVar(2)))
 				{
 					winchDistance = firePreset1.GetVal();//Depends on how much motor spins
 					encoderStart = 1;
 					firePhase = 3;//Goes directly to winchdown in firephase
 				}
 				
-				if(Spyder::GetJoystick(fireWinch1.GetVar(1))->GetRawButton(fireWinch2.GetVar(2)))
+				if(objMan->GetJoystick(fireWinch1.GetVar(1))->GetRawButton(fireWinch2.GetVar(2)))
 				{
 					winchDistance = firePreset2.GetVal();//Ditto
 					encoderStart = 1;
 					firePhase = 3;//Goes directly to winchdown in firephase
 				}
 				
-				if(Spyder::GetJoystick(fireWinch1.GetVar(1))->GetRawButton(fireWinch3.GetVar(2)))
+				if(objMan->GetJoystick(fireWinch1.GetVar(1))->GetRawButton(fireWinch3.GetVar(2)))
 				{
 					winchDistance = firePreset3.GetVal();//Ditto
 					encoderStart  = 1;
@@ -175,7 +181,7 @@ public:
 				double teleopRunTime = curTime - fireStart;
 				
 				//when driver presses button, firephase = 1
-				if(Spyder::GetJoystick(fireButton.GetVar(1))->GetRawButton(fireButton.GetVar(2))
+				if(objMan->GetJoystick(fireButton.GetVar(1))->GetRawButton(fireButton.GetVar(2))
 						&& !firePhase)
 				{
 					firePhase = 1;
@@ -185,14 +191,14 @@ public:
 				switch(firePhase)//meant to fire then reset
 				{
 					case 0://Stop motors after winching OR keep motors from moving in general
-						Spyder::GetSolenoid(pistonSolenoidExt.GetVal())->Set(false);
-						Spyder::GetSolenoid(pistonSolenoidRet.GetVal())->Set(true);
-						Spyder::GetVictor(motorShoot1.GetVal())->Set(0);
+						objMan->GetSolenoid(pistonSolenoidExt.GetVal())->Set(false);
+						objMan->GetSolenoid(pistonSolenoidRet.GetVal())->Set(true);
+						objMan->GetVictor(motorShoot1.GetVal())->Set(0);
 						fireStart = curTime;
 						break;
 					case 1://fire!
-						Spyder::GetSolenoid(pistonSolenoidRet.GetVal())->Set(false);
-						Spyder::GetSolenoid(pistonSolenoidExt.GetVal())->Set(true);
+						objMan->GetSolenoid(pistonSolenoidRet.GetVal())->Set(false);
+						objMan->GetSolenoid(pistonSolenoidExt.GetVal())->Set(true);
 						if (teleopRunTime >= firePhase1Time.GetVal())
 						{
 							fireStart = curTime;
@@ -200,8 +206,8 @@ public:
 						}
 						break;
 					case 2://Re-engage the arm!
-						Spyder::GetSolenoid(pistonSolenoidExt.GetVal())->Set(false);
-						Spyder::GetSolenoid(pistonSolenoidRet.GetVal())->Set(true);
+						objMan->GetSolenoid(pistonSolenoidExt.GetVal())->Set(false);
+						objMan->GetSolenoid(pistonSolenoidRet.GetVal())->Set(true);
 						if(teleopRunTime >=firePhase1Time.GetVal())
 						{
 							fireStart = curTime;
@@ -209,8 +215,8 @@ public:
 						}
 						break;
 					case 3://Winch it back down !
-						Spyder::GetSolenoid(pistonSolenoidExt.GetVal())->Set(false);
-						Spyder::GetSolenoid(pistonSolenoidRet.GetVal())->Set(true);
+						objMan->GetSolenoid(pistonSolenoidExt.GetVal())->Set(false);
+						objMan->GetSolenoid(pistonSolenoidRet.GetVal())->Set(true);
 						if(encoderStart == 1)//initialize encoder
 						{
 							winchEncoder->Start();
@@ -218,7 +224,7 @@ public:
 						}
 						else //encoder should now count correctly
 						{
-							Spyder::GetVictor(motorShoot1.GetVal())->Set(1);
+							objMan->GetVictor(motorShoot1.GetVal())->Set(1);
 							std::cout<<winchEncoder->GetDistance()<<std::endl;
 							if(winchEncoder->GetDistance() >= winchDistance || shooter_limitSwitch.Get())
 							{

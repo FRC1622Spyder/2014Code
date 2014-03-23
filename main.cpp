@@ -52,7 +52,7 @@ class RobotMain : public IterativeRobot
 			//hardware configuration structure
 			//and initialization for a lighter 
 			//object manager
-			objMan = Spyder::WPIObjMgr::GetSingleton();//this->hardwareConfig);
+			objMan = new WPIObjMgr();
 			
 		}
 		
@@ -66,7 +66,7 @@ class RobotMain : public IterativeRobot
 					timespec start;
 					clock_gettime(CLOCK_REALTIME, &start);
 				#endif
-				subsystems[i]->Init(Spyder::M_DISABLED);
+				subsystems[i]->Init(Spyder::M_DISABLED, objMan);
 				#ifdef PROFILE
 					timespec end;
 					clock_gettime(CLOCK_REALTIME, &end);
@@ -86,7 +86,7 @@ class RobotMain : public IterativeRobot
 					timespec start;
 					clock_gettime(CLOCK_REALTIME, &start);
 				#endif
-				subsystems[i]->Init(Spyder::M_AUTO);
+				subsystems[i]->Init(Spyder::M_AUTO, objMan);
 				#ifdef PROFILE
 					timespec end;
 					clock_gettime(CLOCK_REALTIME, &end);
@@ -99,7 +99,7 @@ class RobotMain : public IterativeRobot
 		
 		virtual void TeleopInit()
 		{
-			//if(Spyder::GetJoystick(1)->GetRawButton(9))
+			//if(objMan->GetJoystick(1)->GetRawButton(9))
 			if(objMan->GetJoystick(1)->GetRawButton(9));
 			{
 				std::fstream file;
@@ -118,7 +118,7 @@ class RobotMain : public IterativeRobot
 					timespec start;
 					clock_gettime(CLOCK_REALTIME, &start);
 				#endif
-				subsystems[i]->Init(Spyder::M_TELEOP);
+				subsystems[i]->Init(Spyder::M_TELEOP, objMan);
 				#ifdef PROFILE
 					timespec end;
 					clock_gettime(CLOCK_REALTIME, &end);
@@ -134,7 +134,7 @@ class RobotMain : public IterativeRobot
 			std::vector<Spyder::Subsystem*> subsystems = Spyder::SubsystemMgr::GetSingleton()->GetSubsystems();
 			for(size_t i = 0; i < subsystems.size(); ++i)
 			{
-				subsystems[i]->Init(Spyder::M_TEST);
+				subsystems[i]->Init(Spyder::M_TEST, objMan);
 			}
 		}
 		
