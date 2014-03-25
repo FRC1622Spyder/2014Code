@@ -17,7 +17,8 @@ bool Spyder::Console::Connect(const std::string &strIP, unsigned short usPort)
 }
 
 bool Spyder::Console::SendPacket(const std::string &strSubsystem, Packet& packet)
-{
+{ //Why don't we have documentation on a packet format?
+  //also, nothing seems to call this.
 	std::stringstream ss;
 	int length = strSubsystem.length();
 	ss << std::string((char*)&length, 4); //store first 4 digits of length
