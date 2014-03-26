@@ -17,13 +17,21 @@ bool Spyder::Console::Connect(const std::string &strIP, unsigned short usPort)
 }
 
 bool Spyder::Console::SendPacket(const std::string &strSubsystem, Packet& packet)
-{
+{ //Why don't we have documentation on a packet format?
+  //also, nothing seems to call this.
 	std::stringstream ss;
 	int length = strSubsystem.length();
-	ss << std::string((char*)&length, 4);
-	ss << strSubsystem;
-	ss << packet.GetData();
-	if(sendto(m_socket, const_cast<char*>(ss.str().c_str()), ss.str().length(), 0, (sockaddr*)&m_serverAddr, m_serverAddr.sin_len) == -1)
+	ss << std::string((char*)&length, 4); //store first 4 digits of length
+	ss << strSubsystem; // append contents of strSubsystem
+	ss << packet.GetData(); // append contents of the packet (string data)
+	if(sendto(
+			m_socket, //socket
+			const_cast<char*>(ss.str().c_str()), //buffer
+			ss.str().length(), //buffer length
+			0, //flags; can include MSG_OOB (out of band data), and/or MSG_DONTROUTE. other UNIX flags are not supported.
+			(sockaddr*)&m_serverAddr, //recipent addr
+			m_serverAddr.sin_len) //length of addr
+			== -1)
 	{
 		return false;
 	}
